@@ -1,0 +1,222 @@
+{
+    "0": {
+        "id": "1",
+        "form_id": "3",
+        "is_active": "1",
+        "feed_order": "0",
+        "meta": {
+            "feedName": "User Registration Feed (Create User, Resident)",
+            "feedType": "create",
+            "username": "1",
+            "first_name": "3.3",
+            "last_name": "3.6",
+            "nickname": "3",
+            "displayname": "nickname",
+            "email": "1",
+            "password": "2",
+            "role": "resident",
+            "userMeta": [
+                {
+                    "key": "gf_custom",
+                    "value": "4.3",
+                    "custom_key": "Demo"
+                },
+                {
+                    "key": "gf_custom",
+                    "value": "1002",
+                    "custom_key": "demo_user"
+                }
+            ],
+            "sendEmailEnable": "0",
+            "sendEmailValue": "default",
+            "userActivationEnable": "0",
+            "userActivationValue": "email",
+            "feed_condition_conditional_logic": "1",
+            "feed_condition_conditional_logic_object": {
+                "conditionalLogic": {
+                    "actionType": "show",
+                    "logicType": "all",
+                    "rules": [
+                        {
+                            "fieldId": "6",
+                            "operator": "is",
+                            "value": "Resident"
+                        }
+                    ]
+                }
+            }
+        },
+        "addon_slug": "gravityformsuserregistration",
+        "event_type": null,
+        "migrate_feed_type": "official"
+    },
+    "1": {
+        "id": "2",
+        "form_id": "3",
+        "is_active": "1",
+        "feed_order": "0",
+        "meta": {
+            "feedName": "User Registration Feed (Create User, Faculty)",
+            "feedType": "create",
+            "username": "1",
+            "first_name": "3.3",
+            "last_name": "3.6",
+            "nickname": "3",
+            "displayname": "nickname",
+            "email": "1",
+            "password": "2",
+            "role": "observer",
+            "userMeta": [
+                {
+                    "key": "gf_custom",
+                    "value": "4.3",
+                    "custom_key": "Demo"
+                },
+                {
+                    "key": "default_password_nag",
+                    "value": "1002",
+                    "custom_key": "demo_user"
+                }
+            ],
+            "sendEmailEnable": "0",
+            "sendEmailValue": "default",
+            "userActivationEnable": "0",
+            "userActivationValue": "email",
+            "feed_condition_conditional_logic": "1",
+            "feed_condition_conditional_logic_object": {
+                "conditionalLogic": {
+                    "actionType": "show",
+                    "logicType": "all",
+                    "rules": [
+                        {
+                            "fieldId": "6",
+                            "operator": "is",
+                            "value": "Faculty"
+                        }
+                    ]
+                }
+            }
+        },
+        "addon_slug": "gravityformsuserregistration",
+        "event_type": null,
+        "migrate_feed_type": "official"
+    },
+    "2": {
+        "id": "3",
+        "form_id": "3",
+        "is_active": "1",
+        "feed_order": "0",
+        "meta": {
+            "feedName": "User Registration Feed (Create User, Program Director)",
+            "feedType": "create",
+            "username": "1",
+            "first_name": "3.3",
+            "last_name": "3.6",
+            "nickname": "3",
+            "displayname": "nickname",
+            "email": "1",
+            "password": "2",
+            "role": "program_director",
+            "userMeta": [
+                {
+                    "key": "gf_custom",
+                    "value": "4.1",
+                    "custom_key": "Demo"
+                },
+                {
+                    "key": "gf_custom",
+                    "value": "1002",
+                    "custom_key": "demo_user"
+                },
+                {
+                    "key": "gf_custom",
+                    "value": "1002",
+                    "custom_key": "programID"
+                }
+            ],
+            "sendEmailEnable": "0",
+            "sendEmailValue": "default",
+            "userActivationEnable": "1",
+            "userActivationValue": "email",
+            "feed_condition_conditional_logic": "1",
+            "feed_condition_conditional_logic_object": {
+                "conditionalLogic": {
+                    "actionType": "show",
+                    "logicType": "all",
+                    "rules": [
+                        {
+                            "fieldId": "6",
+                            "operator": "is",
+                            "value": "Program Director"
+                        }
+                    ]
+                }
+            }
+        },
+        "addon_slug": "gravityformsuserregistration",
+        "event_type": null,
+        "migrate_feed_type": "official"
+    },
+    "3": {
+        "id": "4",
+        "form_id": "3",
+        "is_active": "1",
+        "feed_order": "0",
+        "meta": {
+            "feedName": "User Registration Feed (Create User, Resident) - Default",
+            "feedType": "create",
+            "username": "1",
+            "first_name": "3.3",
+            "last_name": "3.6",
+            "nickname": "3",
+            "displayname": "nickname",
+            "email": "1",
+            "password": "2",
+            "role": "resident",
+            "userMeta": [
+                {
+                    "key": "gf_custom",
+                    "value": "4.3",
+                    "custom_key": "Demo"
+                },
+                {
+                    "key": "gf_custom",
+                    "value": "1002",
+                    "custom_key": "demo_user"
+                }
+            ],
+            "sendEmailEnable": "0",
+            "sendEmailValue": "default",
+            "userActivationEnable": "0",
+            "userActivationValue": "email",
+            "feed_condition_conditional_logic": "1",
+            "feed_condition_conditional_logic_object": {
+                "conditionalLogic": {
+                    "actionType": "show",
+                    "logicType": "all",
+                    "rules": [
+                        {
+                            "fieldId": "6",
+                            "operator": "is",
+                            "value": "Resident"
+                        },
+                        {
+                            "fieldId": "6",
+                            "operator": "is",
+                            "value": "Faculty"
+                        },
+                        {
+                            "fieldId": "6",
+                            "operator": "is",
+                            "value": "Program Director"
+                        }
+                    ]
+                }
+            }
+        },
+        "addon_slug": "gravityformsuserregistration",
+        "event_type": null,
+        "migrate_feed_type": "official"
+    },
+    "version": "2.4.22"
+}

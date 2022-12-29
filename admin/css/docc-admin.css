@@ -1,0 +1,282 @@
+.gs-plugins,
+.gs-themes,
+.as-config-table {
+  border: 1px solid #ccc;
+  border-collapse: collapse;
+  margin: 0;
+  padding: 0;
+  max-width: 90%;
+  width: 90%;
+  table-layout: fixed;
+}
+
+.gs-plugins caption,
+.gs-themes caption,
+.as-config-table caption {
+  font-size: 1.5em;
+  margin: .5em 0 .75em;
+}
+
+.gs-plugins th:not(.always-show),
+.gs-plugins td:not(.always-show),
+.gs-themes  th:not(.always-show),
+.gs-themes  td:not(.always-show){
+  display: none;
+}
+
+.gs-plugins tr,
+.gs-themes tr,
+.as-config-table tr {
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+  padding: .35em;
+}
+
+.gs-plugins th,
+.gs-themes th,
+.as-config-table th,
+.gs-plugins td,
+.gs-themes td,
+.as-config-table td {
+  padding: .625em;
+  text-align: center;
+}
+
+.gs-plugins th,
+.gs-themes th,
+.as-config-table th {
+  font-size: .85em;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+a.export_button {
+  background-color: #0a5c80;
+  color: white;
+  text-transform: uppercase;
+  padding: 6px 18px;
+  text-decoration: none;
+}
+
+a.export_button.clicked {
+  background-color: #2a7ca0;
+}
+
+@media screen and (max-width: 600px) {
+
+  .gs-plugins,
+  .gs-themes,
+  .as-config-table {
+    border: 0;
+  }
+
+  .gs-plugins caption,
+  .gs-themes caption,
+  .as-config-table caption {
+    font-size: 1.3em;
+  }
+
+  .gs-plugins thead,
+  .gs-themes thead,
+  .as-config-table thead {
+    border: none;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+  }
+
+  .gs-plugins tr,
+  .gs-themes tr,
+  .as-config-table tr {
+    border-bottom: 3px solid #ddd;
+    display: block;
+    margin-bottom: .625em;
+  }
+
+  .gs-plugins td,
+  .gs-themes td,
+  .as-config-table td {
+    border-bottom: 1px solid #ddd;
+    display: block;
+    font-size: .8em;
+    text-align: right;
+  }
+
+  .gs-plugins td::before,
+  .gs-themes td::before,
+  .as-config-table td::before {
+    /*
+      * aria-label has no advantage, it won't be read inside a table
+      content: attr(aria-label);
+      */
+    content: attr(data-label);
+    float: left;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  .gs-plugins td:last-child,
+  .gs-themes td:last-child,
+  .as-config-table td:last-child {
+    border-bottom: 0;
+  }
+}
+
+#gs-container {
+  margin-right: 10px;
+}
+
+#gs-header-container {
+  display: flex;
+  justify-content: space-between;
+  margin-right: 10px;
+}
+
+#gs-footer-container {
+  display: flex;
+  justify-content: space-between;
+  margin-right: 10px;
+}
+
+#gs-header-start,
+#gs-header-continue,
+#as-header-continue {
+  display: none;
+}
+
+#gs-header-start,
+#gs-header-continue,
+#as-header-start,
+#as-header-continue,
+#asc-continue {
+  margin-left: 50px;
+}
+
+#gs-header-start,
+#gs-header-continue,
+#as-header-start,
+#as-header-continue,
+#asc-continue,
+#te-send {
+  text-align: center;
+  transition: background .5s;
+  color: #FFF;
+  background-color: #00C3AA;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 3px;
+  min-width: 60px;
+}
+
+#gs-header-instructions {
+  display: none;
+}
+
+#as-header-container {
+  display: flex;
+  justify-content: space-between;
+  margin-right: 10px;
+}
+
+#te-email-sent-message {
+  display: none;
+}
+
+#te-error-message {
+  display: none;
+}
+
+#as-roles-status {
+  display: none;
+}
+
+#as-pages-status {
+  display: none;
+}
+
+#as-templates-status {
+  display: none;
+}
+
+#as-customizations-status {
+  display: none;
+}
+
+#as-options-status {
+  display: none;
+}
+
+#as-forms-status {
+  display: none;
+}
+
+#as-feeds-status {
+  display: none;
+}
+
+#as-settings-status {
+  display: none;
+}
+
+#asc-support-email {
+  text-align: center;
+  transition: background .5s;
+  color: black;
+  padding: 8px 20px;
+  font-size: 14px;
+  text-decoration: none;
+  border-radius: 3px;
+  min-width: 60px;
+  border-width: 1px;
+  border-style: solid;
+}
+
+#asc-rerun {
+  text-align: center;
+  transition: background .5s;
+  color: #CC2222;
+  padding: 8px 20px;
+  font-size: 14px;
+  text-decoration: none;
+  border-radius: 3px;
+  min-width: 60px;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.asc-support-info{
+  display: none;
+  border: 1px solid rgba(0,0,0,0.1);
+  padding: 25px;
+}
+
+#gs-instructions,
+#as-instructions,
+#asc-instructions,
+#te-instructions,
+#sc-container {
+  padding: 20px;
+}
+
+.te-troubleshooting-list{
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+#te-email,
+#asc-email {
+  min-width: 331px;
+}
+
+.auto-install-warning {
+  color: #721c24;
+    background-color: #f8d7da;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.25rem;
+}

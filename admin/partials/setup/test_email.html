@@ -1,0 +1,32 @@
+<div id="te-container">
+    <div id="te-instructions">
+        <h1>Test Outgoing Emails</h1>
+        <p>
+            <i>Your DOCC app is ready to use!</i> Use the form below to invite a Program Director to use the app.           
+        </p>
+        
+        <br>
+        <b>Program Director's Email</b>
+        <br/>
+        <i>Note: Don't use your email address because you are already an Administrator in Wordpress.</i>
+        <br/>
+        <input id='te-email' type='email' name='email' placeholder="email-address-of@someone.else"></input>
+        <br/>
+        <br/>
+        <a id='te-send' href="#">Send Test Email</a>
+        <p id='te-email-sent-message'>Email sent successfully!</p>
+        <p id='te-error-message'>Please enter a valid email address and try again.</p>
+        <br/><br/><br/>
+        <b>Did they receive the email?</b>
+        <p>
+            If they received the email then your job is done! If they did not receive the email then you will have to <u>fix outgoing email before
+            inviting more users</u>. Here are a few things to check:
+        </p>
+        <ul class="te-troubleshooting-list">
+            <li>Is the email caught in their spam filter?</li>
+            <li>Is there a firewall blocking outgoing email on this server?</li>
+            <li>Is this server incorrectly using a Remote/Local Mail Exchanger?</li>
+            <li>Are you running this app in a sandbox environment that has outgoing email disabled?</li>
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,63 @@
+#programs-table {
+	max-width: 100%;
+}
+
+/** 
+* Make html table responsive on mobile devices and avoid overflow
+*/
+@media (max-device-width: 500px) {
+
+	#programs-table table,
+	#programs-table thead,
+	#programs-table tbody,
+	#programs-table th,
+	#programs-table td,
+	#programs-table tr {
+		display: block;
+	}
+
+	#programs-table thead tr {
+		position: absolute;
+		top: -9999px;
+		left: -9999px;
+	}
+
+	#programs-table tr {
+		border: 1px solid #ccc;
+	}
+
+	#programs-table td {
+		/* Behave  like a "row" */
+		border: none;
+		border-bottom: 1px solid #eee;
+		position: relative;
+		padding-left: 50%;
+	}
+
+	#programs-table td:before {
+		/* Now like a table header */
+		position: absolute;
+		/* Top/left values mimic padding */
+		top: 6px;
+		left: 6px;
+		width: 45%;
+		padding-right: 10px;
+		white-space: nowrap;
+	}
+
+	#programs-table td:nth-of-type(1):before {
+		content: "Program";
+		font-weight: bold;
+	}
+
+	#programs-table td:nth-of-type(2):before {
+		content: "Broadcast Message";
+		font-weight: bold;
+	}
+
+	#programs-table td:nth-of-type(3):before {
+		content: "Support Contact";
+		font-weight: bold;
+	}
+
+}
