@@ -49,7 +49,7 @@ class Docc_Updater {
 		if( false === $remote || ! $this->cache_allowed ) {
 
 			$remote = wp_remote_get(
-				'https://docc.acgme.org/wp-content/uploads/updater/info.json',
+				'https://raw.githubusercontent.com/5NINESLLC/wp-docp/master/info.json',
 				array(
 					'timeout' => 10,
 					'headers' => array(
