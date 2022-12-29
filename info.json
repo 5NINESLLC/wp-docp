@@ -4,7 +4,7 @@
 	"author" : "<a href='https://design.garden'>design.garden</a>",
 	"author_profile" : "http://design.garden",
 	"version" : "3.0.1",
-	"download_url" : "https://docc.acgme.org/wp-content/uploads/updater/wp-docp.zip",
+	"download_url" : "https://raw.githubusercontent.com/5NINESLLC/wp-docp/master/wp-docp.zip",
 	"requires" : "5.6.0",
 	"tested" : "6.0.3",
 	"requires_php" : "7.0.0",
