@@ -13,6 +13,8 @@ class Nav_Menu_Roles_Import
 
 class WP_Import
 {
+    public bool $fetch_attachments;
+
     public function import()
     {
     }
@@ -42,9 +44,36 @@ class GFAPI
     }
 
     /**
+     * The GFAPI::entry_exists() method is used to check if an entry exists with a specific ID.
+     *
+     * @param integer $entry_id The ID of the entry to check.
+     * @return boolean true if the entry exists. false if the entry doesn’t exist.
+     */
+    public static function entry_exists(int $entry_id)
+    {
+    }
+
+    /**
+     * The GFAPI::get_entry() method is used to get an entry by it’s ID.
+     *
+     * @param integer $entry_id The ID of the entry to retrieve.
+     * @return (array|boolean) An array (Entry Object), if the entry exists. Boolean, false, if an error occurs.
+     */
+    public static function get_entry(int $entry_id)
+    {
+    }
+
+    /**
      * @return iterable|object  
      */
-    public static function get_entries()
+    public static function get_entries($form_ids, $search_criteria = array(), $sorting = null, $paging = null, &$total_count = null)
+    {
+    }
+
+    /**
+     * @return iterable|int  
+     */
+    public static function get_entry_ids($form_ids, $search_criteria = array(), $sorting = null, $paging = null, &$total_count = null)
     {
     }
 }
@@ -76,19 +105,50 @@ function gf_user_registration()
 class GF_User_Registration
 {
     /**
-	 * Retrieve the set password url for the specified user.
-	 *
-	 *
-	 * @param WP_User $user The user object.
-	 *
-	 * @since 3.4.4.
-	 * @since 4.6 Updated to use get_password_reset_key().
-	 *
-	 * @return string
-	 */
-    public function get_set_password_url( WP_User $user )
+     * Retrieve the set password url for the specified user.
+     *
+     *
+     * @param WP_User $user The user object.
+     *
+     * @since 3.4.4.
+     * @since 4.6 Updated to use get_password_reset_key().
+     *
+     * @return string
+     */
+    public function get_set_password_url(WP_User $user)
     {
     }
+}
+
+/**
+ * Get a specific property of an array without needing to check if that property exists.
+ * Provide a default value if you want to return a specific value if the property is not set.
+ * 
+ *
+ * 
+ * @param array $array Array from which the property’s value should be retrieved.  
+ * @param string $prop Name of the property to be retrieved.
+ * @param string $default_value Value that should be returned if the property is not set or empty. Defaults to null. This parameter is OPTIONAL.
+ * @return (null|string|mixed) The value
+ */
+function rgar(array $array, string $prop, string $default_value = null)
+{
+}
+
+/**
+ * Gets a specific property within a multidimensional array.
+ *
+ * @since  Unknown
+ * @access public
+ *
+ * @param array  $array   The array to search in.
+ * @param string $name    The name of the property to find.
+ * @param string $default Optional. Value that should be returned if the property is not set or empty. Defaults to null.
+ *
+ * @return null|string|mixed The value
+ */
+function rgars($array, $name, $default = null)
+{
 }
 
 /* ACF (Advanced Custom Fields) */
@@ -288,6 +348,214 @@ class WC_Product extends WC_Abstract_Legacy_Product
     public function get_title()
     {
     }
+
+    /**
+     * set_attributes
+     *
+     * @param array $attributes
+     * @return void
+     */
+    public function set_attributes(array $attributes)
+    {
+    }
+
+    public function save()
+    {
+    }
+}
+
+class WC_Product_Attribute implements ArrayAccess
+{
+    public function offsetExists(mixed $offset): bool
+    {
+        return false;
+    }
+
+    public function offsetGet(mixed $offset): mixed
+    {
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+    }
+
+    /**
+     * Return if this attribute is a taxonomy.
+     *
+     * @return boolean
+     */
+    public function is_taxonomy()
+    {
+    }
+
+    /**
+     * Get taxonomy name if applicable.
+     *
+     * @return string
+     */
+    public function get_taxonomy()
+    {
+    }
+
+    /**
+     * Get taxonomy object.
+     *
+     * @return array|null
+     */
+    public function get_taxonomy_object()
+    {
+    }
+
+    /**
+     * Gets terms from the stored options.
+     *
+     * @return array|null
+     */
+    public function get_terms()
+    {
+    }
+
+    /**
+     * Gets slugs from the stored options, or just the string if text based.
+     *
+     * @return array
+     */
+    public function get_slugs()
+    {
+    }
+
+    /**
+     * Returns all data for this object.
+     *
+     * @return array
+     */
+    public function get_data()
+    {
+    }
+
+    /*
+	|--------------------------------------------------------------------------
+	| Setters
+	|--------------------------------------------------------------------------
+	*/
+
+    /**
+     * Set ID (this is the attribute ID).
+     *
+     * @param int $value Attribute ID.
+     */
+    public function set_id($value)
+    {
+    }
+
+    /**
+     * Set name (this is the attribute name or taxonomy).
+     *
+     * @param string $value Attribute name.
+     */
+    public function set_name($value)
+    {
+    }
+
+    /**
+     * Set options.
+     *
+     * @param array $value Attribute options.
+     */
+    public function set_options($value)
+    {
+    }
+
+    /**
+     * Set position.
+     *
+     * @param int $value Attribute position.
+     */
+    public function set_position($value)
+    {
+    }
+
+    /**
+     * Set if visible.
+     *
+     * @param bool $value If is visible on Product's additional info tab.
+     */
+    public function set_visible($value)
+    {
+    }
+
+    /**
+     * Set if variation.
+     *
+     * @param bool $value If is used for variations.
+     */
+    public function set_variation($value)
+    {
+    }
+
+    /*
+	|--------------------------------------------------------------------------
+	| Getters
+	|--------------------------------------------------------------------------
+	*/
+
+    /**
+     * Get the ID.
+     *
+     * @return int
+     */
+    public function get_id()
+    {
+    }
+
+    /**
+     * Get name.
+     *
+     * @return string
+     */
+    public function get_name()
+    {
+    }
+
+    /**
+     * Get options.
+     *
+     * @return array
+     */
+    public function get_options()
+    {
+    }
+
+    /**
+     * Get position.
+     *
+     * @return int
+     */
+    public function get_position()
+    {
+    }
+
+    /**
+     * Get if visible.
+     *
+     * @return bool
+     */
+    public function get_visible()
+    {
+    }
+
+    /**
+     * Get if variation.
+     *
+     * @return bool
+     */
+    public function get_variation()
+    {
+    }
 }
 
 /**
@@ -364,3 +632,28 @@ class Jetpack
 function adrotate_group($group)
 {
 }
+
+class WP_CLI
+{
+    public static function add_command()
+    {
+    }
+
+    public static function success()
+    {
+    }
+
+    public static function error()
+    {
+    }
+
+    public static function log()
+    {
+    }
+
+    public static function warning()
+    {
+    }
+}
+
+define('WP_CLI', WP_CLI);

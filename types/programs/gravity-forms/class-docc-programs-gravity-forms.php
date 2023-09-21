@@ -111,12 +111,11 @@ class Docc_Programs_GF extends Docc_Controller
         if (!$user) $user = get_user_by('email', $email);
 
         if (!$user) return;
-        $role = $this->get_role($user_role);
 
-        // if ($role === 'directors') return; // TODO
+        $role = $this->get_role($user_role);
         $users = get_post_meta($program_id, $role, true);
-        if (gettype($users) == "string") $users = [$user->ID];
-        else $users[] = $user->ID;
+        if (!is_array($users)) $users = [];
+        if (!in_array($user->ID, $users)) $users[] = $user->ID;
         update_post_meta($program_id, $role, array_filter($users));
         $meta_role = $this->get_meta_role($role);
         $meta_users = get_post_meta($program_id, $meta_role, true);

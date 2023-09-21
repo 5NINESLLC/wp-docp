@@ -36,4 +36,3 @@ The DOCC (Direct Observation of Clinical Practice) application is a plugin to Wo
 
 = 3.0 =
 Significantly simplifies installation.
-

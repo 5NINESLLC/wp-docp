@@ -65,7 +65,6 @@
 				'styles-and-layouts-for-gravity-forms/styles-layouts-gravity-forms.php',
 				'importexport-add-on-feeds-for-gravity-forms/import-export-feeds-for-gravity-forms.php',
 				'GFChart/gfchart.php',
-				'gfchart-time/gfchart-time.php',
 				'members/members.php',
 				'advanced-custom-fields-font-awesome/acf-font-awesome.php',
 				'advanced-custom-fields-pro/acf.php',

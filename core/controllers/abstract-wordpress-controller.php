@@ -24,8 +24,6 @@ abstract class Wordpress_Controller extends Controller
      */
     protected $version;
 
-    protected $plugin_path;
-
     protected $plugin_url;
 
     /**
@@ -122,5 +120,22 @@ abstract class Wordpress_Controller extends Controller
     public function get_plugin_name()
     {
         return $this->plugin_name;
+    }
+
+    public function GetGravityFormByTitle(string $title)
+    {
+        $existing = GFAPI::get_forms(true);
+
+        foreach ($existing as $form)
+            if ($form["title"] === $title) return $form;
+
+        return null;
+    }
+
+    public static function GetFieldId($form, string $label)
+    {
+        foreach ($form['fields'] as $field) if ($label === $field['label']) return $field['id'];
+
+        return null;
     }
 }

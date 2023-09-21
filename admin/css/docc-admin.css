@@ -273,10 +273,3 @@ a.export_button.clicked {
 #asc-email {
   min-width: 331px;
 }
-
-.auto-install-warning {
-  color: #721c24;
-    background-color: #f8d7da;
-    padding: 0.75rem 1.25rem;
-    border-radius: 0.25rem;
-}

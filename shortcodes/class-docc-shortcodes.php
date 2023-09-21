@@ -62,16 +62,6 @@ class Docc_Shortcodes extends Docc_Controller
         wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/docc-shortcodes.js', array('jquery'), $this->version, false);
     }
 
-    private function GetGravityFormByTitle(string $title)
-    {
-        $existing = GFAPI::get_forms(true);
-
-        foreach ($existing as $form)
-            if ($form["title"] === $title) return $form;
-
-        return null;
-    }
-
     private function GetUserEntries(int $form_id, int $user_id, bool $saved = false)
     {
         $search_criteria = [
@@ -86,11 +76,11 @@ class Docc_Shortcodes extends Docc_Controller
                     'operator' => $saved ? '!=' : '=',
                     'value' => false
                 ],
-                [
+                /*[
                     'key' => 'partial_entry_percent',
                     'operator' => $saved ? '!=' : '=',
                     'value' => false
-                ],
+                ],*/
             ]
         ];
 

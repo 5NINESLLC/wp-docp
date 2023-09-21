@@ -30,15 +30,15 @@
         <?php
         foreach ($entries as $entry) {
             $label = "Program ID";
-            $field_id = DOCC_Programs_GF::GetFieldId($form, $label);
+            $field_id = Docc_Public::GetFieldId($form, $label);
             $program = DOCC_Programs::get_program_by_name($entry[$field_id]);
             $program_id = $program === null? 0 : $program->ID;
             $label = "Resident Email";
-            $field_id = DOCC_Programs_GF::GetFieldID($form, $label);
+            $field_id = Docc_Public::GetFieldId($form, $label);
             $resident_user = get_user_by('email', $entry[$field_id]);
             $resident_id = $resident_user === false ? 0 : get_user_by('email', $entry[$field_id])->ID;
             $label = "Faculty Email";
-            $field_id = DOCC_Programs_GF::GetFieldID($form, $label);
+            $field_id = Docc_Public::GetFieldId($form, $label);
             $faculty_user = get_user_by('email', $entry[$field_id]);
             $faculty_id = $faculty_user === false ? 0 : $faculty_user->ID;
         ?>
@@ -46,7 +46,7 @@
                 <td>
                     <?php
                     $label = "Program ID";
-                    $field_id = DOCC_Programs_GF::GetFieldID($form, $label);
+                    $field_id = Docc_Public::GetFieldId($form, $label);
                     echo $entry[$field_id];
                     ?>
                 </td>
@@ -58,7 +58,7 @@
                 <td>
                     <?php
                     $label = "Setting";
-                    $field_id = DOCC_Programs_GF::GetFieldID($form, $label);
+                    $field_id = Docc_Public::GetFieldId($form, $label);
                     echo $entry[$field_id];
                     ?>
                 </td>
@@ -78,35 +78,35 @@
                 <td>
                     <?php
                     $label = "Complexity of Encounter";
-                    $field_id = DOCC_Programs_GF::GetFieldID($form, $label);
+                    $field_id = Docc_Public::GetFieldId($form, $label);
                     echo $entry[$field_id];
                     ?>
                 </td>
                 <td>
                     <?php
                     $label = "What, if anything, did you observe the resident do well?";
-                    $field_id = DOCC_Programs_GF::GetFieldID($form, $label);
+                    $field_id = Docc_Public::GetFieldId($form, $label);
                     echo $entry[$field_id];
                     ?>
                 </td>
                 <td>
                     <?php
                     $label = "What did the resident do incorrectly or what should they do differently? How should they do that differently?";
-                    $field_id = DOCC_Programs_GF::GetFieldID($form, $label);
+                    $field_id = Docc_Public::GetFieldId($form, $label);
                     echo $entry[$field_id];
                     ?>
                 </td>
                 <td>
                     <?php
                     $label = "Based on your observations, in 1-2 sentences, how would you summarize the big picture of this learner’s skills in this scenario? That is, how would you synthesize your observations into an overarching theme?";
-                    $field_id = DOCC_Programs_GF::GetFieldID($form, $label);
+                    $field_id = Docc_Public::GetFieldId($form, $label);
                     echo $entry[$field_id];
                     ?>
                 </td>
                 <td>
                     <?php
                     $label = "PGY";
-                    $field_id = DOCC_Programs_GF::GetFieldID($form, $label);
+                    $field_id = Docc_Public::GetFieldId($form, $label);
                     echo $entry[$field_id];
                     ?>
                 </td>
@@ -138,7 +138,7 @@
                 <td>
                     <?php
                     $label = "Resident Email";
-                    $field_id = DOCC_Programs_GF::GetFieldID($form, $label);
+                    $field_id = Docc_Public::GetFieldId($form, $label);
                     echo $entry[$field_id];
                     ?>
                 </td>
@@ -150,7 +150,7 @@
                 <td>
                     <?php
                     $label = "Faculty Email";
-                    $field_id = DOCC_Programs_GF::GetFieldID($form, $label);
+                    $field_id = Docc_Public::GetFieldId($form, $label);
                     echo $entry[$field_id];
                     ?>
                 </td>
@@ -158,7 +158,7 @@
                 <td class="hidden-table-entry">
                     <?php
                     $label = "Based on this single observation of history taking, please provide an overall judgement of this learner.";
-                    $field_id = DOCC_Programs_GF::GetFieldID($form, $label);
+                    $field_id = Docc_Public::GetFieldId($form, $label);
                     if (!empty($entry[$field_id])) echo $entry[$field_id];
                     else echo "Not observed";
                     ?>
@@ -166,7 +166,7 @@
                 <td class="hidden-table-entry">
                     <?php
                     $label = "Based on this single observation of physical examination, please provide an overall judgement of this learner.";
-                    $field_id = DOCC_Programs_GF::GetFieldID($form, $label);
+                    $field_id = Docc_Public::GetFieldId($form, $label);
                     if (!empty($entry[$field_id])) echo $entry[$field_id];
                     else echo "Not observed";
                     ?>
@@ -174,7 +174,7 @@
                 <td class="hidden-table-entry">
                     <?php
                     $label = "Based on this single observation of counseling / shared decision making, please provide an overall judgement of this learner.";
-                    $field_id = DOCC_Programs_GF::GetFieldID($form, $label);
+                    $field_id = Docc_Public::GetFieldId($form, $label);
                     if (!empty($entry[$field_id])) echo $entry[$field_id];
                     else echo "Not observed";
                     ?>
@@ -182,7 +182,7 @@
                 <td class="hidden-table-entry">
                     <?php
                     $label = "Based on this single observation of breaking bad news, please provide an overall judgement of this learner.";
-                    $field_id = DOCC_Programs_GF::GetFieldID($form, $label);
+                    $field_id = Docc_Public::GetFieldId($form, $label);
                     if (!empty($entry[$field_id])) echo $entry[$field_id];
                     else echo "Not observed";
                     ?>
@@ -190,7 +190,7 @@
                 <td class="hidden-table-entry">
                     <?php
                     $label = "Based on this single observation of clinical reasoning, please provide an overall judgement of this learner.";
-                    $field_id = DOCC_Programs_GF::GetFieldID($form, $label);
+                    $field_id = Docc_Public::GetFieldId($form, $label);
                     if (!empty($entry[$field_id])) echo $entry[$field_id];
                     else echo "Not observed";
                     ?>
@@ -198,7 +198,7 @@
                 <td class="hidden-table-entry">
                     <?php
                     $label = "Based on this single observation of hand-off, please provide an overall judgement of this learner.";
-                    $field_id = DOCC_Programs_GF::GetFieldID($form, $label);
+                    $field_id = Docc_Public::GetFieldId($form, $label);
                     if (!empty($entry[$field_id])) echo $entry[$field_id];
                     else echo "Not observed";
                     ?>

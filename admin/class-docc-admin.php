@@ -57,7 +57,6 @@ class Docc_Admin // TODO:  extends Docc_Controller
         'gravityformswebhooks/webhooks.php' => 'Gravity Forms Webhooks Add-On',
         'importexport-add-on-feeds-for-gravity-forms/import-export-feeds-for-gravity-forms.php' => 'Import/Export Add-On Feeds for Gravity Forms',
         'GFChart/gfchart.php' => 'GFChart',
-        'gfchart-time/gfchart-time.php' => 'GFChart Charting vs Time Add-On',
         'members/members.php' => 'Members',
         'nav-menu-roles/nav-menu-roles.php' => 'Nav Menu Roles',
         'shortcode-in-menus/shortcode-in-menus.php' => 'Shortcode in Menus',
@@ -108,7 +107,7 @@ class Docc_Admin // TODO:  extends Docc_Controller
         // TODO: Use admin_enqueue_scripts
 
         wp_enqueue_script($this->plugin_name . "-setup", plugin_dir_url(__FILE__) . 'js/docc-setup.js', ['jquery'], $this->version, false);
-        wp_localize_script($this->plugin_name . "-admin", 'localized_vars', [
+        wp_localize_script($this->plugin_name . "-setup", 'localized_vars', [
             "pluginUrlPath" => $this->plugin_url, 
             "setupStatus" => $STATUS, 
             "autoSetup" => add_query_arg(['page' => 'auto-setup'], admin_url('admin.php')),
@@ -273,7 +272,7 @@ class Docc_Admin // TODO:  extends Docc_Controller
     {
         if ( get_option( 'siteurl' ) !== get_option( 'home' ) ) return true;
 
-        if (strlen(home_url('/', 'relative')) > 0) return true;
+        if (strlen(rtrim(home_url('/', 'relative'), '/')) > 0) return true;
 
         return false;
     }
@@ -961,7 +960,6 @@ class Docc_Admin // TODO:  extends Docc_Controller
         $plugins = [
             'gravityformswebhooks/webhooks.php' => false,
             'GFChart/gfchart.php' => false,
-            'gfchart-time/gfchart-time.php' => false,
             'styles-and-layouts-for-gravity-forms/styles-layouts-gravity-forms.php' => false
         ];
 

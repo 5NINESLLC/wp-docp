@@ -63,7 +63,8 @@ class Docc_Updater {
 				|| 200 !== wp_remote_retrieve_response_code( $remote )
 				|| empty( wp_remote_retrieve_body( $remote ) )
 			) {
-				var_dump('error');
+				// TODO: Log this error... but, note that it occurs multiple times per page, so
+				//       don't just dump it to the page.
 				return false;
 			}
 

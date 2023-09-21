@@ -6,6 +6,8 @@
  */
 abstract class Controller
 {
+    protected $plugin_path;
+    
     protected $partials_path;
 
     /**

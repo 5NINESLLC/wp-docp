@@ -118,7 +118,7 @@ class Docc_Public extends Docc_Controller
         } else if (self::IsResident()) {
 
             $label = "Resident Email";
-            $field_id = DOCC_Programs_GF::GetFieldId($form, $label);
+            $field_id = self::GetFieldId($form, $label);
             $search_criteria['field_filters'][] = ['key' => $field_id, 'value' => $user->user_email];
         } else if (self::IsObserver()) {
 
@@ -129,7 +129,7 @@ class Docc_Public extends Docc_Controller
             foreach ($user_programs as $program) $programs[] = $program->post_title;
 
             $label = "Program ID";
-            $field_id = DOCC_Programs_GF::GetFieldId($form, $label);
+            $field_id = self::GetFieldId($form, $label);
             $search_criteria['field_filters'][] = ['key' => $field_id, 'operator' => 'in', 'value' => $programs];
         } else if (self::IsProgramDirector()) {
             $search_criteria['field_filters'][] = ['key' => 'created_by', 'value' => $user->ID];
@@ -191,15 +191,6 @@ class Docc_Public extends Docc_Controller
     }
 
     /** Private helper functions */
-    private function GetGravityFormByTitle(string $title)
-    {
-        $existing = GFAPI::get_forms(true);
-
-        foreach ($existing as $form)
-            if ($form["title"] === $title) return $form;
-
-        return null;
-    }
 
     /**
      * 
@@ -250,12 +241,12 @@ class Docc_Public extends Docc_Controller
                 $current_user = wp_get_current_user();
                 // TODO: set inputs by name... they may not always be 60 and 61.
                 $label = "Faculty Email";
-                $field_id = DOCC_Programs_GF::GetFieldId($form, $label);
+                $field_id = self::GetFieldId($form, $label);
                 $_POST["input_$field_id"] = $current_user->user_email;
                 $label = "Resident Email";
-                $post = DOCC_Programs_GF::GetFieldId($form, $label);
+                $post = self::GetFieldId($form, $label);
                 $label = "Select a Resident Name/Email";
-                $field_id = DOCC_Programs_GF::GetFieldId($form, $label);
+                $field_id = self::GetFieldId($form, $label);
                 $_POST["input_$post"] = rgpost("input_$field_id");
                 break;
             default:

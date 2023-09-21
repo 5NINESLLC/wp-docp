@@ -12,7 +12,7 @@
  * Plugin Name:       DOCC app
  * Plugin URI:        https://design.garden
  * Description:       Main plugin for custom app functionality.
- * Version:           3.0.0
+ * Version:           3.0.2
  * Author:            design.garden
  * Author URI:        https://design.garden
  * License:           GPL-2.0+
@@ -33,7 +33,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'DOCC_VERSION', '3.0.0' );
+define( 'DOCC_VERSION', '3.0.2' );
 
 /**
  * The code that runs during plugin activation.

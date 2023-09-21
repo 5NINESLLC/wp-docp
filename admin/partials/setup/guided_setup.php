@@ -2,13 +2,23 @@
     <div id="gs-instructions">
         <h1>DOCC Setup</h1>
         <?php if ($subdirectory) : ?>
-            <div class="auto-install-warning">
-                <strong>Subdirectory Installation Detected: </strong>
-                <span>
+            <div id="query-message" class="alert alert-dismissible collapse alert-danger" role="alert" style="display: block;">
+                <button id="query-message-dismiss" type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <strong id="query-message-title">Subdirectory Installation Detected: </strong>
+                <span id="query-message-body">
                     It appears that your Wordpress installation is not running in the root folder of your web server.
                     This can cause trouble for the DOCC app because the imported layouts use relative links.
                     Please consider correcting this issue before continuing.
                 </span>
+                <br/><br/>
+                <i>Debug info:</i>
+                <br/>
+                <code><?php
+                echo "siteurl: ",get_option( 'siteurl' ); 
+                echo "<br/>","&nbsp;home: &nbsp;&nbsp;&nbsp;",get_option( 'home' );
+                ?></code>
             </div>
         <?php endif; ?>
         <p>
