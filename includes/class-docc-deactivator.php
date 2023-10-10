@@ -20,7 +20,8 @@
  * @subpackage Docc/includes
  * @author     Anthony Jacobs <tony@design.garden>
  */
-class Docc_Deactivator {
+class Docc_Deactivator
+{
 
 	/**
 	 * Short Description. (use period)
@@ -29,8 +30,7 @@ class Docc_Deactivator {
 	 *
 	 * @since    1.0.0
 	 */
-	public static function deactivate() {
-
+	public static function deactivate()
+	{
 	}
-
 }

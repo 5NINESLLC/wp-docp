@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The abstract class for all Controllers.
  * 
@@ -7,7 +8,7 @@
 abstract class Controller
 {
     protected $plugin_path;
-    
+
     protected $partials_path;
 
     /**

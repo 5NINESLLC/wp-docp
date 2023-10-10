@@ -67,7 +67,7 @@ class Docc_Admin // TODO:  extends Docc_Controller
 
     private $menu_slug = "docc-setup";
 
-    private static $NavMenus = ["admin-menu"=>9,"default-menu"=>10,"main-menu"=>11,"resident-menu"=>12];
+    private static $NavMenus = ["admin-menu" => 9, "default-menu" => 10, "main-menu" => 11, "resident-menu" => 12];
 
     /**
      * Initialize the class and set its properties.
@@ -108,8 +108,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
 
         wp_enqueue_script($this->plugin_name . "-setup", plugin_dir_url(__FILE__) . 'js/docc-setup.js', ['jquery'], $this->version, false);
         wp_localize_script($this->plugin_name . "-setup", 'localized_vars', [
-            "pluginUrlPath" => $this->plugin_url, 
-            "setupStatus" => $STATUS, 
+            "pluginUrlPath" => $this->plugin_url,
+            "setupStatus" => $STATUS,
             "autoSetup" => add_query_arg(['page' => 'auto-setup'], admin_url('admin.php')),
             "setupComplete" => add_query_arg(['page' => 'setup-complete'], admin_url('admin.php')),
             "adminAjax" => admin_url('admin-ajax.php'),
@@ -120,18 +120,20 @@ class Docc_Admin // TODO:  extends Docc_Controller
 
         wp_enqueue_script($this->plugin_name . "-admin", plugin_dir_url(__FILE__) . 'js/docc-admin.js', ['jquery'], $this->version, false);
     }
-    
+
     public function wp_die_ajax_handler($function)
     {
         $error = error_get_last();
 
         // No error, just skip the error handling code.
-        if ( null === $error ) {
+        if (null === $error)
+        {
             return $function;
         }
 
         // Bail if this error should not be handled.
-        if ( ! $this->should_handle_error( $error ) ) {
+        if (!$this->should_handle_error($error))
+        {
             return $function;
         }
 
@@ -147,18 +149,19 @@ class Docc_Admin // TODO:  extends Docc_Controller
      * @param array $error Error information retrieved from error_get_last().
      * @return bool Whether WordPress should handle this error.
      */
-    protected function should_handle_error( $error ) 
+    protected function should_handle_error($error)
     {
         $error_types_to_handle = array(
-                E_ERROR,
-                E_PARSE,
-                E_USER_ERROR,
-                E_COMPILE_ERROR,
-                E_RECOVERABLE_ERROR,
+            E_ERROR,
+            E_PARSE,
+            E_USER_ERROR,
+            E_COMPILE_ERROR,
+            E_RECOVERABLE_ERROR,
         );
 
-        if ( isset( $error['type'] ) && in_array( $error['type'], $error_types_to_handle, true ) ) {
-                return true;
+        if (isset($error['type']) && in_array($error['type'], $error_types_to_handle, true))
+        {
+            return true;
         }
 
         /**
@@ -173,37 +176,43 @@ class Docc_Admin // TODO:  extends Docc_Controller
          * @param bool  $should_handle_error Whether the error should be handled by the fatal error handler.
          * @param array $error               Error information retrieved from error_get_last().
          */
-        return (bool) apply_filters( 'wp_should_handle_php_error', false, $error );
+        return (bool) apply_filters('wp_should_handle_php_error', false, $error);
     }
 
     public function ajax_shutdown_function()
     {
-        @header( 'Content-Type: application/json; charset=' . get_option( 'blog_charset' ) );
+        @header('Content-Type: application/json; charset=' . get_option('blog_charset'));
 
-        if ( ! headers_sent() ) 
+        if (!headers_sent())
         {
-            status_header( 400 );
+            status_header(400);
             nocache_headers();
         }
 
-        $response = [ 
+        $response = [
             'success' => false,
             'notices' => error_get_last()
         ];
 
-        echo wp_json_encode( $response );
+        echo wp_json_encode($response);
     }
 
     private function get_setup_status(): int
     {
-        switch( get_option('docc_setup_status') )
+        switch (get_option('docc_setup_status'))
         {
-            case '(0/3) Setup In Progress': return 1;
-            case '(1/3) Guided Setup': return 2;
-            case '(2/3) Automatic Setup': return 3;
-            case '(2/3) Test Support Email (Optional)': return 4;
-            case '(3/3) Test Email': return 5;
-            case '(3/3) Setup Complete': return 6;
+            case '(0/3) Setup In Progress':
+                return 1;
+            case '(1/3) Guided Setup':
+                return 2;
+            case '(2/3) Automatic Setup':
+                return 3;
+            case '(2/3) Test Support Email (Optional)':
+                return 4;
+            case '(3/3) Test Email':
+                return 5;
+            case '(3/3) Setup Complete':
+                return 6;
         }
 
         return 0;
@@ -222,7 +231,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
             'dashicons-welcome-widgets-menus',
             1
         );
-        if ('(0/3) Setup In Progress' !== $STATUS && '(3/3) Setup Complete' !== $STATUS) {
+        if ('(0/3) Setup In Progress' !== $STATUS && '(3/3) Setup Complete' !== $STATUS)
+        {
             add_submenu_page(
                 $this->menu_slug,
                 'Import Settings',
@@ -233,7 +243,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
                 2
             );
         }
-        if ('(0/3) Setup In Progress' !== $STATUS && '(1/3) Guided Setup' !== $STATUS && '(3/3) Setup Complete' !== $STATUS) {
+        if ('(0/3) Setup In Progress' !== $STATUS && '(1/3) Guided Setup' !== $STATUS && '(3/3) Setup Complete' !== $STATUS)
+        {
             add_submenu_page(
                 $this->menu_slug,
                 'Support',
@@ -244,7 +255,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
                 3
             );
         }
-        if ('(0/3) Setup In Progress' !== $STATUS && '(1/3) Guided Setup' !== $STATUS) {
+        if ('(0/3) Setup In Progress' !== $STATUS && '(1/3) Guided Setup' !== $STATUS)
+        {
             add_submenu_page(
                 $this->menu_slug,
                 'Test Email',
@@ -255,7 +267,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
                 4
             );
         }
-        if ('(3/3) Setup Complete' === $STATUS) {
+        if ('(3/3) Setup Complete' === $STATUS)
+        {
             add_submenu_page(
                 $this->menu_slug,
                 'Setup Complete',
@@ -270,7 +283,7 @@ class Docc_Admin // TODO:  extends Docc_Controller
 
     private function wordpress_is_installed_in_subdirectory(): bool
     {
-        if ( get_option( 'siteurl' ) !== get_option( 'home' ) ) return true;
+        if (get_option('siteurl') !== get_option('home')) return true;
 
         if (strlen(rtrim(home_url('/', 'relative'), '/')) > 0) return true;
 
@@ -322,7 +335,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
         $zip = new ZipArchive;
         $res = $zip->open($theme_loc);
 
-        if ($res === true) {
+        if ($res === true)
+        {
 
             $zip->extractTo(get_theme_root());
             $zip->close();
@@ -330,7 +344,9 @@ class Docc_Admin // TODO:  extends Docc_Controller
             $DEBUG['guided-setup']['theme_installed'][0] = true;
             // $DEBUG['guided-setup']['theme_installed'][1] = [];
 
-        } else {
+        }
+        else
+        {
 
             $DEBUG['guided-setup']['theme_installed'][0] = false;
             $DEBUG['guided-setup']['theme_installed'][1][] = "ERROR: Unable to install theme. There was a problem opening the theme file at $theme_loc";
@@ -350,12 +366,15 @@ class Docc_Admin // TODO:  extends Docc_Controller
 
         $theme = wp_get_theme('Divi');
 
-        if ($theme->exists()) {
+        if ($theme->exists())
+        {
 
             switch_theme('Divi');
 
             $DEBUG['guided-setup']['theme_active'][0] = true;
-        } else {
+        }
+        else
+        {
 
             $DEBUG['guided-setup']['theme_active'][0] = false;
             $DEBUG['guided-setup']['theme_active'][1][] = "ERROR: Unable to activate theme, it is not installed.";
@@ -369,7 +388,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
 
         $DEBUG = get_option('docc_debug');
 
-        if (!isset($_POST['plugin']) || trim($_POST['plugin']) === '') {
+        if (!isset($_POST['plugin']) || trim($_POST['plugin']) === '')
+        {
 
             $DEBUG['guided-setup']['plugins_installed'][1][] = "WARNING: Function called without plugin defined.";
 
@@ -378,7 +398,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
 
         $slug = $this->get_slug_from_base($_POST['plugin']);
 
-        if (!is_string($slug)) {
+        if (!is_string($slug))
+        {
 
             $DEBUG['guided-setup']['plugins_installed'][1][] = "WARNING: Tried to install plugin with invalid format i.e. not a string.";
 
@@ -391,13 +412,16 @@ class Docc_Admin // TODO:  extends Docc_Controller
         $zip = new ZipArchive;
         $res = $zip->open($plugin_loc);
 
-        if ($res === true) {
+        if ($res === true)
+        {
 
             $zip->extractTo(WP_PLUGIN_DIR);
             $zip->close();
 
             $DEBUG['guided-setup']['plugins_installed'][0] = $this->all_plugins_installed() ? true : false;
-        } else {
+        }
+        else
+        {
 
             $DEBUG['guided-setup']['plugins_installed'][0] = false;
             $DEBUG['guided-setup']['plugins_installed'][1][] = "ERROR: Unable to install plugin. There was a problem opening the plugin '$slug' at '$plugin_loc'.";
@@ -413,7 +437,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
 
         $DEBUG = get_option('docc_debug');
 
-        if (!isset($_POST['plugin']) || trim($_POST['plugin']) === '') {
+        if (!isset($_POST['plugin']) || trim($_POST['plugin']) === '')
+        {
 
             $DEBUG['guided-setup']['plugins_active'][1][] = "WARNING: Function called without plugin defined.";
 
@@ -422,7 +447,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
 
         $plugin = $_POST['plugin'];
 
-        if (!is_string($plugin)) {
+        if (!is_string($plugin))
+        {
 
             $DEBUG['guided-setup']['plugins_active'][1][] = "WARNING: Tried to install plugin with invalid format i.e. not a string.";
 
@@ -458,12 +484,15 @@ class Docc_Admin // TODO:  extends Docc_Controller
             'observer' => 'Observer',
             'program_director' => 'Program Director'
         ];
-        foreach ($roles as $role => $display_name) {
+        foreach ($roles as $role => $display_name)
+        {
             $added_role = add_role($role, $display_name, ['read' => true]);
-            if (is_null($added_role)) {
+            if (is_null($added_role))
+            {
             } // TODO: Add to debug info, role already exists
         }
-        foreach ($roles as $role => $display) {
+        foreach ($roles as $role => $display)
+        {
             if (is_null(get_role($role))) wp_die('AJAX error', 500);
         }
         wp_die();
@@ -471,8 +500,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
 
     public function wp_ajax_import_pages()
     {
-        add_filter( 'wp_die_ajax_handler', [$this, 'wp_die_ajax_handler'], 100 );
-        
+        add_filter('wp_die_ajax_handler', [$this, 'wp_die_ajax_handler'], 100);
+
         ob_start(); // TODO: This isn't stopping the debug output from the importer...
 
         // throw new Exception("Menu configuration failed123.");
@@ -491,12 +520,12 @@ class Docc_Admin // TODO:  extends Docc_Controller
         $count_menus_error = 0;
         // throw new Exception("Menu configuration failed.");
         foreach (self::$NavMenus as $slug => $id)
-            if (!$this->_menuIdIsCorrect($slug, $id)) 
+            if (!$this->_menuIdIsCorrect($slug, $id))
                 if ($this->_tryToFixMenuId($slug, $id))
                     $count_menus_fixed++;
                 else
                     $count_menus_error++;
-            
+
         // TODO: Improve error messaging.
 
         $content = ob_get_clean();
@@ -550,35 +579,41 @@ class Docc_Admin // TODO:  extends Docc_Controller
 
         $old_term_id = $menu->term_id;
 
-        $wpdb->update( $wpdb->terms, ['term_id' => $id], ['term_id' => $old_term_id]);
-        $wpdb->update( $wpdb->term_taxonomy, ['term_id' => $id], ['term_id' => $old_term_id]);
+        $wpdb->update($wpdb->terms, ['term_id' => $id], ['term_id' => $old_term_id]);
+        $wpdb->update($wpdb->term_taxonomy, ['term_id' => $id], ['term_id' => $old_term_id]);
 
         return true;
     }
 
     private function _requireImportClasses()
     {
-        if (!class_exists('WP_Importer')) {
+        if (!class_exists('WP_Importer'))
+        {
             $class_wp_importer = ABSPATH . 'wp-admin/includes/class-wp-importer.php';
             require_once $class_wp_importer;
         }
-        if (!class_exists('WP_Import')) {
+        if (!class_exists('WP_Import'))
+        {
             $class_wp_import = ABSPATH . 'wp-content/plugins/wordpress-importer/class-wp-import.php';
             require_once $class_wp_import;
         }
-        if (!class_exists('WXR_Parser')) {
+        if (!class_exists('WXR_Parser'))
+        {
             $class_wxr_parser = ABSPATH . 'wp-content/plugins/wordpress-importer/parsers/class-wxr-parser.php';
             require_once $class_wxr_parser;
         }
-        if (!class_exists('WXR_Parser_XML')) {
+        if (!class_exists('WXR_Parser_XML'))
+        {
             $class_wxr_parser_xml = ABSPATH . 'wp-content/plugins/wordpress-importer/parsers/class-wxr-parser-xml.php';
             require_once $class_wxr_parser_xml;
         }
-        if (!class_exists('WXR_Parser_SimpleXML')) {
+        if (!class_exists('WXR_Parser_SimpleXML'))
+        {
             $class_wxr_parser_simplexml = ABSPATH . 'wp-content/plugins/wordpress-importer/parsers/class-wxr-parser-simplexml.php';
             require_once $class_wxr_parser_simplexml;
         }
-        if (!class_exists('WXR_Parser_Regex')) {
+        if (!class_exists('WXR_Parser_Regex'))
+        {
             $class_wxr_parser_regex = ABSPATH . 'wp-content/plugins/wordpress-importer/parsers/class-wxr-parser-regex.php';
             require_once $class_wxr_parser_regex;
         }
@@ -596,7 +631,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
 
         if (!class_exists('GFAPI')) wp_die('AJAX error', 500);
 
-        foreach ($forms_json as $form) {
+        foreach ($forms_json as $form)
+        {
             $result[] = GFAPI::add_form($form);
         }
 
@@ -619,7 +655,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
         $user_registration_form = $this->GetGravityFormByTitle("User Registration");
         $form_id = $user_registration_form['id'];
 
-        foreach ($user_registration_feeds_json as $feed) {
+        foreach ($user_registration_feeds_json as $feed)
+        {
             if (is_array($feed)) $result[] = GFAPI::add_feed($form_id, $feed['meta'], $feed['addon_slug']);
         }
 
@@ -633,7 +670,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
         $invite_user_form = $this->GetGravityFormByTitle("Invite User to Program");
         $form_id = $invite_user_form['id'];
 
-        foreach ($invite_user_feeds_json as $feed) {
+        foreach ($invite_user_feeds_json as $feed)
+        {
             $result[] = GFAPI::add_feed($form_id, $feed['meta'], $feed['addon_slug']);
         }
 
@@ -702,7 +740,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
 
         $this->_requireImportClasses();
 
-        if (!class_exists('Nav_Menu_Roles_Import')) {
+        if (!class_exists('Nav_Menu_Roles_Import'))
+        {
             $class_nav_menu_roles_importer = ABSPATH . 'wp-content/plugins/nav-menu-roles/inc/class-nav-menu-roles-import.php';
             require_once $class_nav_menu_roles_importer;
         }
@@ -732,12 +771,14 @@ class Docc_Admin // TODO:  extends Docc_Controller
         // TODO: Only delete Pages, Posts and Forms that were created by this plugin.
 
         $pages = get_pages();
-        foreach ($pages as $page) {
+        foreach ($pages as $page)
+        {
             wp_delete_post($page->ID, true);
         }
 
         $posts = get_posts();
-        foreach ($posts as $post) {
+        foreach ($posts as $post)
+        {
             wp_delete_post($post->ID, true);
         }
 
@@ -747,7 +788,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
             'Default Menu',
             'Resident Menu'
         ];
-        foreach ($menu_names as $name) {
+        foreach ($menu_names as $name)
+        {
             $menu = get_term_by('name', $name, 'nav_menu');
             wp_delete_term($menu->term_id, $menu->taxonomy);
         }
@@ -757,11 +799,13 @@ class Docc_Admin // TODO:  extends Docc_Controller
             'observer',
             'program_director'
         ];
-        foreach ($roles as $role) {
+        foreach ($roles as $role)
+        {
             remove_role($role);
         }
-        
-        foreach (GFAPI::get_forms() as $form) {
+
+        foreach (GFAPI::get_forms() as $form)
+        {
             GFAPI::delete_form($form['id']);
         }
 
@@ -777,7 +821,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
         // check for global debug info
         $DEBUG = get_option('docc_debug');
 
-        if (!isset($_POST['sender']) || trim($_POST['sender']) === '') {
+        if (!isset($_POST['sender']) || trim($_POST['sender']) === '')
+        {
 
             $DEBUG['test-email']['setup-errors'][1][] = "WARNING: Function called without sender defined.";
 
@@ -786,7 +831,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
 
         $sender = filter_var($_POST['sender'], FILTER_SANITIZE_EMAIL);
 
-        if (!isset($_POST['msg'])) {
+        if (!isset($_POST['msg']))
+        {
 
             $DEBUG['test-email']['setup-errors'][1][] = "WARNING: Function called without message defined.";
 
@@ -805,12 +851,15 @@ class Docc_Admin // TODO:  extends Docc_Controller
 
         $result = wp_mail($to, $subject, $message, $headers);
 
-        if ($result) {
+        if ($result)
+        {
 
             $DEBUG['test-email']['setup-errors'][0] = true;
 
             update_option('docc_setup_status', '(2/3) Test Support Email (Optional)');
-        } else {
+        }
+        else
+        {
 
             $DEBUG['test-email']['setup-errors'][0] = false;
             $DEBUG['test-email']['setup-errors'][1][] = "ERROR: Server could not send email with debug info.";
@@ -824,7 +873,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
     public function wp_ajax_test_email()
     {
 
-        if (!isset($_POST['email']) || trim($_POST['email']) === '') {
+        if (!isset($_POST['email']) || trim($_POST['email']) === '')
+        {
 
             $DEBUG['test-email']['email-validated'][1][] = "WARNING: Function called without email defined.";
 
@@ -839,7 +889,7 @@ class Docc_Admin // TODO:  extends Docc_Controller
         $email_is_same_as_admin = ($current_email == $to) ? true : false;
         $subject = $email_is_same_as_admin ? "Setting up email for you new DOCC installation" : "Register a Program Director for you DOCC installation";
 
-        $registration_link = get_site_url(null, 'register/?email='.$to.'&role=Program%20Director');
+        $registration_link = get_site_url(null, 'register/?email=' . $to . '&role=Program%20Director');
         $logout_link = wp_logout_url($registration_link);
 
         $message = $this->Partial("admin/partials/mail/test_email.php", compact("registration_link", "logout_link"));
@@ -850,12 +900,15 @@ class Docc_Admin // TODO:  extends Docc_Controller
 
         $result = wp_mail($to, $subject, $message, $headers);
 
-        if ($result) {
+        if ($result)
+        {
 
             $DEBUG['test-email']['email-validated'][0] = true;
 
             update_option('docc_setup_status', '(3/3) Test Email');
-        } else {
+        }
+        else
+        {
 
             $DEBUG['test-email']['email-validated'][0] = false;
             $DEBUG['test-email']['email-validated'][1][] = "ERROR: Server could not send test email to $to.";
@@ -907,7 +960,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
     {
         include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
         $api = plugins_api('plugin_information', ['slug' => $plugin_slug, 'fields' => ['sections' => false]]);
-        if (is_wp_error($api) || !property_exists($api, "version")) {
+        if (is_wp_error($api) || !property_exists($api, "version"))
+        {
             return false;
         }
         return $api->version ?: '';
@@ -931,7 +985,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
 
     private function all_plugins_installed()
     {
-        foreach ($this->plugin_names as $plugin_slug => $plugin_name) {
+        foreach ($this->plugin_names as $plugin_slug => $plugin_name)
+        {
             if (!$this->get_plugin_install_status($plugin_slug)) return false;
         }
         return true;
@@ -939,7 +994,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
 
     private function all_plugins_active()
     {
-        foreach ($this->plugin_names as $plugin_slug => $plugin_name) {
+        foreach ($this->plugin_names as $plugin_slug => $plugin_name)
+        {
             if (!$this->get_plugin_active_status($plugin_slug)) return false;
         }
         return true;
@@ -993,13 +1049,14 @@ class Docc_Admin // TODO:  extends Docc_Controller
 
         if (false === $status) add_option('docc_setup_status');
 
-        if ("(3/3) Setup Complete" === $status) {
+        if ("(3/3) Setup Complete" === $status)
+        {
             // TODO: display message that setup has been completed, redirecting to dashboard  (timeout secs)
             exit(wp_redirect(admin_url('admin.php?page=setup-complete')));
         }
 
         update_option('docc_setup_status', '(0/3) Setup In Progress');
-        exit(wp_redirect(admin_url('admin.php?page='.$this->menu_slug)));
+        exit(wp_redirect(admin_url('admin.php?page=' . $this->menu_slug)));
     }
 
     /** Helper function to determine if a user's name is set */
@@ -1038,7 +1095,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
             is_admin()
             && !current_user_can('administrator')
             && !(defined('DOING_AJAX') && DOING_AJAX)
-        ) {
+        )
+        {
             wp_redirect(home_url());
             exit;
         }
@@ -1058,12 +1116,11 @@ class Docc_Admin // TODO:  extends Docc_Controller
 
                 foreach ($faculty as $id) $faculty_ids[] = strval($id);
                 update_post_meta($post->ID, 'faculty_ids', $faculty_ids);
-                
+
                 foreach ($residents as $id) $resident_ids[] = strval($id);
                 update_post_meta($post->ID, 'resident_ids', $resident_ids);
             }
         }
-        
     }
 
     function extra_user_profile_fields($user)
@@ -1096,14 +1153,15 @@ class Docc_Admin // TODO:  extends Docc_Controller
 
         if ($allow && !is_wp_error($allow))
         {
-            $key = wp_generate_password( 20, false );
-            do_action( 'retrieve_password_key', $user_login, $key );
-            if ( empty( $wp_hasher ) ) {
+            $key = wp_generate_password(20, false);
+            do_action('retrieve_password_key', $user_login, $key);
+            if (empty($wp_hasher))
+            {
                 require_once ABSPATH . 'wp-includes/class-phpass.php';
-                $wp_hasher = new PasswordHash( 8, true );
+                $wp_hasher = new PasswordHash(8, true);
             }
-            $hashed = time() . ':' . $wp_hasher->HashPassword( $key );
-            $wpdb->update( $wpdb->users, array( 'user_activation_key' => $hashed ), array( 'user_login' => $user_login ) );
+            $hashed = time() . ':' . $wp_hasher->HashPassword($key);
+            $wpdb->update($wpdb->users, array('user_activation_key' => $hashed), array('user_login' => $user_login));
             $message = network_site_url("wp-login.php?action=rp&key=$key&login=" . rawurlencode($user_login), 'login');
         }
 
@@ -1133,7 +1191,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
     protected function GetPlugins(): array
     {
         $ret = [];
-        foreach ($this->plugin_names as $slug => $name) {
+        foreach ($this->plugin_names as $slug => $name)
+        {
             $ret[] = [
                 'plugin' => $name,
                 'slug' => $slug,
@@ -1150,7 +1209,8 @@ class Docc_Admin // TODO:  extends Docc_Controller
     protected function GetThemes(): array
     {
         $ret = [];
-        foreach ($this->theme_names as $name) {
+        foreach ($this->theme_names as $name)
+        {
             $ret[] = [
                 'theme' => $name,
                 'version' => '', // get_theme_version();
