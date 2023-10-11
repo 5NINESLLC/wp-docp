@@ -97,9 +97,9 @@ class Docc_Programs_GF extends Docc_Controller
         if ($entry["1002.1"] !== "DEMO") return;
         $program = Docc_Programs::get_program_by_name("DEMO Program");
         $label = "Email";
-        $email_id = $this->GetFieldId($form, $label);
+        $email_id = self::GetFieldId($form, $label);
         $label = "Select your role in the organization";
-        $role_id = $this->GetFieldId($form, $label);
+        $role_id = self::GetFieldId($form, $label);
         $this->add_user_to_program($program->ID, $entry[$email_id], $entry[$role_id]);
     }
 
@@ -117,9 +117,11 @@ class Docc_Programs_GF extends Docc_Controller
         if (!is_array($users)) $users = [];
         if (!in_array($user->ID, $users)) $users[] = $user->ID;
         update_post_meta($program_id, $role, array_filter($users));
+
         $meta_role = $this->get_meta_role($role);
         $meta_users = get_post_meta($program_id, $meta_role, true);
-        $meta_users[] = strval($user->ID);
+        if (!is_array($meta_users)) $meta_users = [];
+        if (!in_array(strval($user->ID), $meta_users)) $meta_users[] = strval($user->ID);
         update_post_meta($program_id, $meta_role, array_filter($meta_users));
     }
 
@@ -166,7 +168,7 @@ class Docc_Programs_GF extends Docc_Controller
     public function populate_invite_message($form)
     {
         $label = "Program";
-        $field_id = $this->GetFieldId($form, $label);
+        $field_id = self::GetFieldId($form, $label);
         $program_name = rgpost("input_$field_id");
         $program = get_posts([
             'title'  => $program_name,
@@ -176,18 +178,18 @@ class Docc_Programs_GF extends Docc_Controller
         ])[0];
         $invitation_message = get_post_meta($program->ID, 'invitation_message', true);
         $label = "Invitation Message";
-        $field_id = $this->GetFieldId($form, $label);
+        $field_id = self::GetFieldId($form, $label);
         $_POST["input_$field_id"] = $invitation_message;
     }
 
     public function verify_user($form)
     {
         $label = "Email";
-        $field_id = $this->GetFieldId($form, $label);
+        $field_id = self::GetFieldId($form, $label);
         $user_email = rgpost("input_$field_id");
         $user = get_user_by('email', $user_email);
         $label = "New User?";
-        $field_id = $this->GetFieldId($form, $label);
+        $field_id = self::GetFieldId($form, $label);
         $_POST["input_$field_id"] = $user ? "No" : "Yes";
     }
 
@@ -198,7 +200,7 @@ class Docc_Programs_GF extends Docc_Controller
         switch ($form['title']) {
             case "Create Program":
                 $label = "Program Title";
-                $field_id = $this->GetFieldId($form, $label);
+                $field_id = self::GetFieldId($form, $label);
                 $program_name = rgpost("input_$field_id");
                 if ($this->program_exists($program_name)) {
                     $validation_result['is_valid'] = false;
@@ -207,18 +209,18 @@ class Docc_Programs_GF extends Docc_Controller
                 break;
             case "Invite User to Program":
                 $label = "Program";
-                $field_id = $this->GetFieldId($form, $label);
+                $field_id = self::GetFieldId($form, $label);
                 if ($_GET['programID'] !== rgpost("input_$field_id")) {
                     $validation_result['is_valid'] = false;
                     wp_redirect(home_url("my-programs"));
                 }
                 $label = "Email";
-                $field_id = $this->GetFieldId($form, $label);
+                $field_id = self::GetFieldId($form, $label);
                 $user_email = rgpost("input_$field_id");
                 $user = get_user_by('email', $user_email);
                 if (!$user) return $validation_result;
                 $label = "Select role in the program";
-                $field_id = $this->GetFieldId($form, $label);
+                $field_id = self::GetFieldId($form, $label);
                 $selected_role = $this->get_role_slug_from_name(rgpost("input_$field_id"));
                 if (!in_array($selected_role, (array) $user->roles)) {
                     $validation_result['is_valid'] = false;
@@ -420,13 +422,6 @@ class Docc_Programs_GF extends Docc_Controller
             $this->add_user_to_program($program->ID, $email, $role);
             delete_user_meta($user->ID, $PROGRAM_ID);
         }
-    }
-
-    public static function GetFieldId($form, string $label)
-    {
-        foreach ($form['fields'] as $field) if ($label === $field['label']) return $field['id'];
-
-        return null;
     }
 
     private function _getEntryValue($form, $entry, string $label)

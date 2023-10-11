@@ -20,7 +20,8 @@
  * @subpackage Docc/includes
  * @author     Anthony Jacobs <tony@design.garden>
  */
-class Docc_Activator {
+class Docc_Activator
+{
 
 	/**
 	 * Short Description. (use period)
@@ -29,8 +30,7 @@ class Docc_Activator {
 	 *
 	 * @since    1.0.0
 	 */
-	public static function activate() {
-
+	public static function activate()
+	{
 	}
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The abstract class for all Controllers.
  * 

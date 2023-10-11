@@ -24,7 +24,8 @@
  * @subpackage Docc/includes
  * @author     Anthony Jacobs <tony@design.garden>
  */
-class Docc_i18n {
+class Docc_i18n
+{
 
 
 	/**
@@ -32,16 +33,13 @@ class Docc_i18n {
 	 *
 	 * @since    1.0.0
 	 */
-	public function load_plugin_textdomain() {
+	public function load_plugin_textdomain()
+	{
 
 		load_plugin_textdomain(
 			'DOCC',
 			false,
-			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
+			dirname(dirname(plugin_basename(__FILE__))) . '/languages/'
 		);
-
 	}
-
-
-
 }

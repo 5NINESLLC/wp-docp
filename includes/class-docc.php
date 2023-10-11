@@ -74,9 +74,12 @@ class Docc
      */
     public function __construct()
     {
-        if (defined('DOCC_VERSION')) {
+        if (defined('DOCC_VERSION'))
+        {
             $this->version = DOCC_VERSION;
-        } else {
+        }
+        else
+        {
             $this->version = '1.0.0';
         }
         $this->plugin_name = 'DOCC';
@@ -89,9 +92,12 @@ class Docc
 
         $this->define_programs_hooks();
 
-        if (is_admin() || is_customize_preview()) {
+        if (is_admin() || is_customize_preview())
+        {
             $this->define_admin_hooks();
-        } else {
+        }
+        else
+        {
             $this->define_public_hooks();
             $this->define_shortcode_hooks();
         }
@@ -255,7 +261,7 @@ class Docc
     {
         $plugin_public = new Docc_Public($this->get_plugin_name(), $this->get_version(), $this->get_plugin_path(), $this->get_plugin_url(), "public/partials/");
 
-        $this->loader->add_action('wp_head', $plugin_public, 'enqueue_manifest' );
+        $this->loader->add_action('wp_head', $plugin_public, 'enqueue_manifest');
         $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
         $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
         $this->loader->add_action('init', $plugin_public, 'init', 10);
@@ -270,7 +276,7 @@ class Docc
         $this->loader->add_filter('authenticate', $plugin_public, 'authenticate', 30, 3);
         $this->loader->add_filter('login_redirect', $plugin_public, 'login_redirect', 10, 3);
         $this->loader->add_filter('gform_incomplete_submissions_expiration_days', $plugin_public, 'gform_incomplete_submissions_expiration_days', 10, 1);
-        $this->loader->add_filter( 'wp_die_handler', $plugin_public, 'wp_die_handler' );
+        $this->loader->add_filter('wp_die_handler', $plugin_public, 'wp_die_handler');
 
         $this->loader->add_shortcode('query_message', $plugin_public, 'query_message');
         $this->loader->add_shortcode('add_chart', $plugin_public, 'add_chart');
