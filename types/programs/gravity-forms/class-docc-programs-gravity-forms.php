@@ -304,7 +304,7 @@ class Docc_Programs_GF extends Docc_Controller
                     $field->placeholder = 'Select a Program';
                     $field->choices = $choices;
                     break;
-                case "Select a Resident Name/Email":
+                case strpos($field['label'], "Select a Resident") === 0:
                     $choices = [];
                     if (DOCC_Public::demo_mode_active()) {
                         for ($i = 0; $i < 10; $i++) {
