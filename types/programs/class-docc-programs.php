@@ -119,23 +119,29 @@ class Docc_Programs extends Docc_Controller
                 foreach ($director_ids as $id)
                 {
                     $user = get_user_by('id', $id);
-                    $directors[$id]->name = $user->display_name;
-                    $directors[$id]->email = $user->user_email;
-                    $directors[$id]->roles = $user->roles;
+                    $directors[$id] = [
+                        'name' => $user->display_name,
+                        'email' => $user->user_email,
+                        'roles' => $user->roles
+                    ];
                 }
                 foreach ($faculty_ids as $id)
                 {
                     $user = get_user_by('id', $id);
-                    $faculty[$id]->name = $user->display_name;
-                    $faculty[$id]->email = $user->user_email;
-                    $faculty[$id]->roles = $user->roles;
+                    $faculty[$id] = [
+                        'name' => $user->display_name,
+                        'email' => $user->user_email,
+                        'roles' => $user->roles
+                    ];
                 }
                 foreach ($resident_ids as $id)
                 {
                     $user = get_user_by('id', $id);
-                    $residents[$id]->name = $user->display_name;
-                    $residents[$id]->email = $user->user_email;
-                    $residents[$id]->roles = $user->roles;
+                    $residents[$id] = [
+                        'name' => $user->display_name,
+                        'email' => $user->user_email,
+                        'roles' => $user->roles
+                    ];
                 }
                 $users["directors"] = $directors;
                 $users["faculty"] = $faculty;
