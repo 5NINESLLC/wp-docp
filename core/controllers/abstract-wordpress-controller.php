@@ -139,4 +139,11 @@ abstract class Wordpress_Controller extends Controller
 
         return null;
     }
+
+    public static function GetFieldIdByStartOfLabel($form, string $label)
+    {
+        foreach ($form['fields'] as $field) if (strpos($field['label'], $label) === 0) return $field['id'];
+
+        return null;
+    }
 }
