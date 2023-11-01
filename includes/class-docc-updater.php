@@ -32,7 +32,7 @@ class Docc_Updater {
 	public function __construct() {
 
 		$this->plugin_slug = plugin_basename( __DIR__ );
-		$this->version = '3.0.2';
+		$this->version = '3.0.3';
 		$this->cache_key = 'docc_upd';
 		$this->cache_allowed = false;
 

@@ -239,15 +239,16 @@ class Docc_Public extends Docc_Controller
         switch ($form['title']) {
             case "New Observation":
                 $current_user = wp_get_current_user();
-                // TODO: set inputs by name... they may not always be 60 and 61.
+
                 $label = "Faculty Email";
                 $field_id = self::GetFieldId($form, $label);
                 $_POST["input_$field_id"] = $current_user->user_email;
+
                 $label = "Resident Email";
-                $post = self::GetFieldId($form, $label);
-                $label = "Select a Resident Name/Email";
-                $field_id = self::GetFieldId($form, $label);
-                $_POST["input_$post"] = rgpost("input_$field_id");
+                $resident_email_field_id = self::GetFieldId($form, $label);
+                $label = "Select a Resident";
+                $field_id = self::GetFieldIdByStartOfLabel($form, $label);
+                $_POST["input_$resident_email_field_id"] = rgpost("input_$field_id");
                 break;
             default:
                 // nothing

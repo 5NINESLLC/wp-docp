@@ -3,16 +3,16 @@
 	"slug" : "docc",
 	"author" : "<a href='https://design.garden'>design.garden</a>",
 	"author_profile" : "http://design.garden",
-	"version" : "3.0.1",
+	"version" : "3.0.3",
 	"download_url" : "https://raw.githubusercontent.com/5NINESLLC/wp-docp/master/wp-docp.zip",
 	"requires" : "5.6.0",
-	"tested" : "6.0.3",
+	"tested" : "6.3.2",
 	"requires_php" : "7.0.0",
-	"last_updated" : "2022-12-29 11:00:00",
+	"last_updated" : "2023-10-31 19:13:00",
 	"sections" : {
 		"description" : "Main plugin for custom app functionality.",
 		"installation" : "Starting from the DOCC Setup menu, follow the on-screen instructions to progress through the pages of the automatic setup.",
-		"changelog" : "<h4>3.0.1 –  29 December 2022</h4><ul><li>Enable automatic updates</li></ul>"
+		"changelog" : "<h4>3.0.3 –  10 October 2023</h4><ul><li>Minor gravity forms improvements.</li></ul><h4>3.0.1 –  29 December 2022</h4><ul><li>Enable automatic updates</li></ul>"
 	},
 	"banners" : {
 		"low" : "https://rudrastyh.com/wp-content/uploads/updater/banner-772x250.jpg",
