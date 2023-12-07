@@ -227,9 +227,10 @@ class Docc_Public extends Docc_Controller
     protected function format_date($date)
     { // TODO: Used by "display_observations.php"
         if ($date !== "" && $date !== null) {
-            $y_m_d = explode(' ', $date)[0];
-            $date = explode('-', $y_m_d);
-            return  $date[1] . "/" . $date[2] . "/" . $date[0];
+            $centralTimezone = new DateTimeZone('America/Chicago');
+            $date_utc = new DateTime($date, new DateTimeZone('UTC'));
+            $date_utc->setTimezone($centralTimezone);
+            return $date_utc->format('m/d/Y');
         }
         return $date;
     }
