@@ -21,12 +21,10 @@
  * Domain Path:       /languages
  */
 
-// register_shutdown_function( "docc_fatal_handler" ); function docc_fatal_handler() { var_dump(error_get_last()); }
+ register_shutdown_function( "docc_fatal_handler" ); function docc_fatal_handler() { var_dump(error_get_last()); }
 
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
-	die;
-}
+if ( ! defined( 'WPINC' ) ) die;
 
 /**
  * Currently plugin version.
@@ -72,9 +70,7 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-docc.php';
  * @since    1.0.0
  */
 function run_docc() {
-
 	$plugin = new Docc();
 	$plugin->run();
-
 }
 run_docc();

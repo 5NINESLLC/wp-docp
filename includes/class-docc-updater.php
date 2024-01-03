@@ -17,7 +17,8 @@
  * @subpackage Docc/includes
  * @author     Anthony Jacobs <tony@design.garden>
  */
-class Docc_Updater {
+class Docc_Updater
+{
 
 	public $plugin_slug;
 	public $version;
@@ -29,74 +30,67 @@ class Docc_Updater {
 	 *
 	 * @since    3.0.0
 	 */
-	public function __construct() {
-
-		$this->plugin_slug = plugin_basename( __DIR__ );
+	public function __construct()
+	{
+		$this->plugin_slug = plugin_basename(__DIR__);
 		$this->version = '3.0.3';
 		$this->cache_key = 'docc_upd';
 		$this->cache_allowed = false;
 
-		add_filter( 'plugins_api', array( $this, 'info' ), 20, 3 );
-		add_filter( 'site_transient_update_plugins', array( $this, 'update' ) );
-		add_action( 'upgrader_process_complete', array( $this, 'purge' ), 10, 2 );
-
+		add_filter('plugins_api', array($this, 'info'), 20, 3);
+		add_filter('site_transient_update_plugins', array($this, 'update'));
+		add_action('upgrader_process_complete', array($this, 'purge'), 10, 2);
 	}
 
-	public function request() {
+	function info($res, $action, $args)
+	{
+		if ('plugin_information' !== $action || $this->plugin_slug !== $args->slug) return $res;
 
-		$remote = get_transient( $this->cache_key );
-
-		if( false === $remote || ! $this->cache_allowed ) {
-
-			$remote = wp_remote_get(
-				'https://raw.githubusercontent.com/5NINESLLC/wp-docp/master/info.json',
-				array(
-					'timeout' => 10,
-					'headers' => array(
-						'Accept' => 'application/json'
-					)
-				)
-			);
-
-			if(
-				is_wp_error( $remote )
-				|| 200 !== wp_remote_retrieve_response_code( $remote )
-				|| empty( wp_remote_retrieve_body( $remote ) )
-			) {
-				// TODO: Log this error... but, note that it occurs multiple times per page, so
-				//       don't just dump it to the page.
-				return false;
-			}
-
-			set_transient( $this->cache_key, $remote, DAY_IN_SECONDS );
-
-		}
-
-		$remote = json_decode( wp_remote_retrieve_body( $remote ) );
-		
-		return $remote;
-
-	}
-
-	function info( $res, $action, $args ) {
-
-		// do nothing if you're not getting plugin information right now
-		if( 'plugin_information' !== $action ) {
-			return $res;
-		}
-
-		// do nothing if it is not our plugin
-		if( $this->plugin_slug !== $args->slug ) {
-			return $res;
-		}
-
-		// get updates
 		$remote = $this->request();
 
-		if( ! $remote ) {
-			return $res;
+		if (!$remote) return $res;
+
+		return $this->populatePluginInfo($remote);
+	}
+
+	public function request()
+	{
+		$remote = get_transient($this->cache_key);
+
+		if (false === $remote || !$this->cache_allowed)
+		{
+			$remote = $this->getPluginInfo();
+
+			if ($this->remoteHasErrors($remote)) return false;
+
+			set_transient($this->cache_key, $remote, DAY_IN_SECONDS);
 		}
 
+		$remote = json_decode(wp_remote_retrieve_body($remote));
+		
+		return $remote;
+	}
+
+	public function getPluginInfo()
+	{
+		return wp_remote_get(
+			'https://raw.githubusercontent.com/5NINESLLC/wp-docp/master/info.json',
+			array(
+				'timeout' => 10,
+				'headers' => array(
+					'Accept' => 'application/json'
+				)
+			)
+		);
+	}
+
+	public function remoteHasErrors($remote)
+	{
+		return is_wp_error($remote) || 200 !== wp_remote_retrieve_response_code($remote) || empty(wp_remote_retrieve_body($remote));
+	}
+
+	public function populatePluginInfo($remote)
+	{
 		$res = new stdClass();
 
 		$res->name = $remote->name;
@@ -117,7 +111,7 @@ class Docc_Updater {
 			'changelog' => $remote->sections->changelog
 		);
 
-		if( ! empty( $remote->banners ) ) {
+		if (!empty($remote->banners)) {
 			$res->banners = array(
 				'low' => $remote->banners->low,
 				'high' => $remote->banners->high
@@ -125,48 +119,43 @@ class Docc_Updater {
 		}
 
 		return $res;
-
 	}
 
-	public function update( $transient ) {
-
-		if ( empty($transient->checked ) ) {
-			return $transient;
-		}
+	public function update($transient)
+	{
+		if (empty($transient->checked)) return $transient;
 		
 		$remote = $this->request();
-		if(
-			$remote
-			&& version_compare( $this->version, $remote->version, '<' )
-			&& version_compare( $remote->requires, get_bloginfo( 'version' ), '<=' )
-			&& version_compare( $remote->requires_php, PHP_VERSION, '<' )
-		) {
-			$res = new stdClass();
-			$res->slug = $this->plugin_slug;
-			$res->plugin = 'wp-docp/docc.php';
-			$res->new_version = $remote->version;
-			$res->tested = $remote->tested;
-			$res->package = $remote->download_url;
+
+		if ($this->shouldUpdate($remote))
+		{
+			$res = $this->getRemotePluginInfo($remote);
 
 			$transient->response[ $res->plugin ] = $res;
-
 		}
 
 		return $transient;
-
 	}
 
-	public function purge( $upgrader, $options ){
-
-		if (
-			$this->cache_allowed
-			&& 'update' === $options['action']
-			&& 'plugin' === $options[ 'type' ]
-		) {
-			// just clean the cache when new plugin version is installed
-			delete_transient( $this->cache_key );
-		}
-
+	public function shouldUpdate($remote)
+	{
+		return $remote && version_compare($this->version, $remote->version, '<') && version_compare($remote->requires, get_bloginfo( 'version' ), '<=') && version_compare($remote->requires_php, PHP_VERSION, '<');
 	}
 
+	public function getRemotePluginInfo($remote)
+	{
+		$res = new stdClass();
+		$res->slug = $this->plugin_slug;
+		$res->plugin = 'wp-docp/docc.php';
+		$res->new_version = $remote->version;
+		$res->tested = $remote->tested;
+		$res->package = $remote->download_url;
+
+		return $res;
+	}
+
+	public function purge( $upgrader, $options )
+	{
+		if ($this->cache_allowed && 'update' === $options['action'] && 'plugin' === $options[ 'type' ]) delete_transient($this->cache_key);
+	}
 }

@@ -74,19 +74,13 @@ class Docc
      */
     public function __construct()
     {
-        if (defined('DOCC_VERSION'))
-        {
-            $this->version = DOCC_VERSION;
-        }
-        else
-        {
-            $this->version = '1.0.0';
-        }
+        $this->version = defined('DOCC_VERSION') ? DOCC_VERSION : '1.0.0';
         $this->plugin_name = 'DOCC';
         $this->plugin_path = plugin_dir_path(dirname(__FILE__));
         $this->plugin_url = plugin_dir_url(dirname(__FILE__));
 
         $this->check_for_updates();
+
         $this->load_dependencies();
         $this->set_locale();
 
@@ -163,7 +157,7 @@ class Docc
         require_once $this->plugin_path . 'public/class-docc-public.php';
 
         /**
-         * The class responsible for defining all actions that occur in the public-facing
+         * The class responsible for defining all shortcodes that occur in the public-facing
          * side of the site.
          */
         require_once $this->plugin_path . 'shortcodes/class-docc-shortcodes.php';
