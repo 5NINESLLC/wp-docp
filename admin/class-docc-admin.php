@@ -20,27 +20,8 @@
  * @subpackage Docc/admin
  * @author     Anthony Jacobs <tony@design.garden>
  */
-class Docc_Admin // TODO:  extends Docc_Controller
+class Docc_Admin extends Docc_Controller
 {
-
-    /**
-     * The ID of this plugin.
-     *
-     * @since    1.0.0
-     * @access   private
-     * @var      string    $plugin_name    The ID of this plugin.
-     */
-    private $plugin_name;
-
-    /**
-     * The version of this plugin.
-     *
-     * @since    1.0.0
-     * @access   private
-     * @var      string    $version    The current version of this plugin.
-     */
-    private $version;
-
     protected $plugin_url;
 
     protected $plugin_path;
@@ -78,7 +59,6 @@ class Docc_Admin // TODO:  extends Docc_Controller
      */
     public function __construct($plugin_name, $version, $plugin_url, $plugin_path)
     {
-
         $this->plugin_name = $plugin_name;
         $this->version = $version;
         $this->plugin_url = $plugin_url;
@@ -159,10 +139,7 @@ class Docc_Admin // TODO:  extends Docc_Controller
             E_RECOVERABLE_ERROR,
         );
 
-        if (isset($error['type']) && in_array($error['type'], $error_types_to_handle, true))
-        {
-            return true;
-        }
+        if (isset($error['type']) && in_array($error['type'], $error_types_to_handle, true)) return true;
 
         /**
          * Filters whether a given thrown error should be handled by the fatal error handler.
@@ -1001,16 +978,6 @@ class Docc_Admin // TODO:  extends Docc_Controller
         return true;
     }
 
-    private function GetGravityFormByTitle(string $title)
-    {
-        $existing = GFAPI::get_forms(true);
-
-        foreach ($existing as $form)
-            if ($form["title"] === $title) return $form;
-
-        return null;
-    }
-
     private function is_plugin_required($slug)
     {
         $plugins = [
@@ -1024,7 +991,6 @@ class Docc_Admin // TODO:  extends Docc_Controller
 
     public function activated_plugin()
     {
-
         $debug_info = get_option('docc_debug');
 
         if (false === $debug_info) add_option('docc_debug');
@@ -1168,24 +1134,6 @@ class Docc_Admin // TODO:  extends Docc_Controller
         echo $message;
 
         wp_die();
-    }
-
-    /**
-     * Get the content of a partial file.
-     * 
-     * @param string $partial_path 
-     * @param null|array $args 
-     * @return string 
-     */
-    protected function Partial(string $partial_path, ?array $args = null): string
-    {
-        if ($args !== null) extract($args);
-
-        ob_start();
-        include $this->plugin_path . $partial_path;
-        $content = ob_get_clean();
-
-        return is_string($content) ? $content : "";
     }
 
     protected function GetPlugins(): array
