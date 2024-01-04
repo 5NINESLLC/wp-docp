@@ -21,7 +21,7 @@
  * Domain Path:       /languages
  */
 
- register_shutdown_function( "docc_fatal_handler" ); function docc_fatal_handler() { var_dump(error_get_last()); }
+// register_shutdown_function( "docc_fatal_handler" ); function docc_fatal_handler() { var_dump(error_get_last()); }
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) die;

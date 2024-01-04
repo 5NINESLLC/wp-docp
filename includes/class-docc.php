@@ -212,6 +212,7 @@ class Docc
 
         $this->loader->add_action('wp_ajax_install_theme', $plugin_admin, 'wp_ajax_install_theme');
         $this->loader->add_action('wp_ajax_activate_theme', $plugin_admin, 'wp_ajax_activate_theme');
+        
         $this->loader->add_action('wp_ajax_install_plugin', $plugin_admin, 'wp_ajax_install_plugin');
         $this->loader->add_action('wp_ajax_activate_plugin', $plugin_admin, 'wp_ajax_activate_plugin');
         $this->loader->add_action('wp_ajax_setup_status', $plugin_admin, 'wp_ajax_setup_status');

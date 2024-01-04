@@ -197,7 +197,10 @@ class Docc_Admin extends Docc_Controller
 
     public function guided_setup_page()
     {
-        $STATUS = get_option('docc_setup_status');
+        $status = get_option('docc_setup_status');
+        $isSetupInProgress = $status === '(0/3) Setup In Progress';
+        $isGuidedSetup = $status === '(1/3) Guided Setup';
+        $isSetupComplete = $status === '(3/3) Setup Complete';
 
         add_menu_page(
             'Install Dependencies',
@@ -208,7 +211,7 @@ class Docc_Admin extends Docc_Controller
             'dashicons-welcome-widgets-menus',
             1
         );
-        if ('(0/3) Setup In Progress' !== $STATUS && '(3/3) Setup Complete' !== $STATUS)
+        if (!$isSetupInProgress && !$isSetupComplete)
         {
             add_submenu_page(
                 $this->menu_slug,
@@ -220,7 +223,7 @@ class Docc_Admin extends Docc_Controller
                 2
             );
         }
-        if ('(0/3) Setup In Progress' !== $STATUS && '(1/3) Guided Setup' !== $STATUS && '(3/3) Setup Complete' !== $STATUS)
+        if (!$isSetupInProgress && !$isGuidedSetup && !$isSetupComplete)
         {
             add_submenu_page(
                 $this->menu_slug,
@@ -232,7 +235,7 @@ class Docc_Admin extends Docc_Controller
                 3
             );
         }
-        if ('(0/3) Setup In Progress' !== $STATUS && '(1/3) Guided Setup' !== $STATUS)
+        if (!$isSetupInProgress && !$isGuidedSetup)
         {
             add_submenu_page(
                 $this->menu_slug,
@@ -244,7 +247,7 @@ class Docc_Admin extends Docc_Controller
                 4
             );
         }
-        if ('(3/3) Setup Complete' === $STATUS)
+        if ($isSetupComplete)
         {
             add_submenu_page(
                 $this->menu_slug,
@@ -304,29 +307,47 @@ class Docc_Admin extends Docc_Controller
     /** AJAX */
     public function wp_ajax_install_theme()
     {
-
-        $DEBUG = get_option('docc_debug');
+        $DEBUG = get_option('docc_debug', []);
 
         $theme_loc = $this->plugin_path . 'admin/dependencies/themes/Divi.zip';
 
-        $zip = new ZipArchive;
-        $res = $zip->open($theme_loc);
-
-        if ($res === true)
+        if (!file_exists($theme_loc))
         {
-
-            $zip->extractTo(get_theme_root());
-            $zip->close();
-
-            $DEBUG['guided-setup']['theme_installed'][0] = true;
-            // $DEBUG['guided-setup']['theme_installed'][1] = [];
-
-        }
-        else
-        {
-
             $DEBUG['guided-setup']['theme_installed'][0] = false;
-            $DEBUG['guided-setup']['theme_installed'][1][] = "ERROR: Unable to install theme. There was a problem opening the theme file at $theme_loc";
+            $DEBUG['guided-setup']['theme_installed'][1][] = "ERROR: Unable to install theme. The theme file at $theme_loc does not exist.";
+
+            update_option('docc_debug', $DEBUG);
+
+            wp_die();
+        }
+
+        if (!class_exists('ZipArchive'))
+        {
+            $DEBUG['guided-setup']['theme_installed'][0] = false;
+            $DEBUG['guided-setup']['theme_installed'][1][] = "ERROR: ZipArchive class is not available.";
+
+            update_option('docc_debug', $DEBUG);
+
+            wp_die();
+        }
+
+        $zip = new ZipArchive;
+
+        if (true === $zip->open($theme_loc))
+        {
+            if ($zip->extractTo(get_theme_root())) {
+                $zip->close();
+                
+                $DEBUG['guided-setup']['theme_installed'][0] = true;
+            } else {
+                $zip->close();
+
+                $DEBUG['guided-setup']['theme_installed'][0] = false;
+                $DEBUG['guided-setup']['theme_installed'][1][] = "ERROR: Unable to extract theme.";
+            }
+        } else {
+            $DEBUG['guided-setup']['theme_installed'][0] = false;
+            $DEBUG['guided-setup']['theme_installed'][1][] = "ERROR: Unable to open theme file at $theme_loc.";
         }
 
         update_option('docc_debug', $DEBUG);
@@ -336,23 +357,20 @@ class Docc_Admin extends Docc_Controller
 
     public function wp_ajax_activate_theme()
     {
+        $DEBUG = get_option('docc_debug', []);
 
-        $DEBUG = get_option('docc_debug');
-
-        if (wp_get_theme() === 'Divi') wp_die();
+        if (wp_get_theme()->get_stylesheet() === 'Divi') wp_die();
 
         $theme = wp_get_theme('Divi');
 
         if ($theme->exists())
         {
-
             switch_theme('Divi');
 
             $DEBUG['guided-setup']['theme_active'][0] = true;
         }
         else
         {
-
             $DEBUG['guided-setup']['theme_active'][0] = false;
             $DEBUG['guided-setup']['theme_active'][1][] = "ERROR: Unable to activate theme, it is not installed.";
         }
@@ -362,36 +380,53 @@ class Docc_Admin extends Docc_Controller
 
     public function wp_ajax_install_plugin()
     {
-
-        $DEBUG = get_option('docc_debug');
+        $DEBUG = get_option('docc_debug', []);
 
         if (!isset($_POST['plugin']) || trim($_POST['plugin']) === '')
         {
-
+            $DEBUG['guided-setup']['plugins_installed'][0] = false;
             $DEBUG['guided-setup']['plugins_installed'][1][] = "WARNING: Function called without plugin defined.";
+            update_option('docc_debug', $DEBUG);
 
             wp_die();
         }
 
-        $slug = $this->get_slug_from_base($_POST['plugin']);
+        $slug = $this->GetSlugFromBase($_POST['plugin']);
 
         if (!is_string($slug))
         {
-
+            $DEBUG['guided-setup']['plugins_installed'][0] = false;
             $DEBUG['guided-setup']['plugins_installed'][1][] = "WARNING: Tried to install plugin with invalid format i.e. not a string.";
 
             wp_die();
         }
 
         $slug = filter_var($slug, FILTER_SANITIZE_STRING);
+
         $plugin_loc = $this->plugin_path . 'admin/dependencies/plugins/' . $slug . '.zip';
 
-        $zip = new ZipArchive;
-        $res = $zip->open($plugin_loc);
-
-        if ($res === true)
+        if (!file_exists($plugin_loc))
         {
+            $DEBUG['guided-setup']['plugins_installed'][0] = false;
+            $DEBUG['guided-setup']['plugins_installed'][1][] = "ERROR: Plugin file '$slug' not found at '$plugin_loc'.";
+            update_option('docc_debug', $DEBUG);
 
+            wp_die();
+        }
+
+        if (!class_exists('ZipArchive'))
+        {
+            $DEBUG['guided-setup']['plugins_installed'][0] = false;
+            $DEBUG['guided-setup']['plugins_installed'][1][] = "ERROR: ZipArchive class is not available.";
+            update_option('docc_debug', $DEBUG);
+
+            wp_die();
+        }
+
+        $zip = new ZipArchive;
+
+        if (true === $zip->open($plugin_loc))
+        {
             $zip->extractTo(WP_PLUGIN_DIR);
             $zip->close();
 
@@ -399,7 +434,6 @@ class Docc_Admin extends Docc_Controller
         }
         else
         {
-
             $DEBUG['guided-setup']['plugins_installed'][0] = false;
             $DEBUG['guided-setup']['plugins_installed'][1][] = "ERROR: Unable to install plugin. There was a problem opening the plugin '$slug' at '$plugin_loc'.";
         }
@@ -411,22 +445,20 @@ class Docc_Admin extends Docc_Controller
 
     public function wp_ajax_activate_plugin()
     {
+        $DEBUG = get_option('docc_debug', []);
 
-        $DEBUG = get_option('docc_debug');
+        $plugin = isset($_POST['plugin']) ? trim($_POST['plugin']) : '';
 
-        if (!isset($_POST['plugin']) || trim($_POST['plugin']) === '')
+        if (!$plugin)
         {
-
             $DEBUG['guided-setup']['plugins_active'][1][] = "WARNING: Function called without plugin defined.";
+            update_option('docc_debug', $DEBUG);
 
             wp_die();
         }
 
-        $plugin = $_POST['plugin'];
-
         if (!is_string($plugin))
         {
-
             $DEBUG['guided-setup']['plugins_active'][1][] = "WARNING: Tried to install plugin with invalid format i.e. not a string.";
 
             wp_die();
@@ -434,12 +466,19 @@ class Docc_Admin extends Docc_Controller
 
         $plugin = filter_var($plugin, FILTER_SANITIZE_STRING);
 
-        activate_plugin($plugin);
+        $activation_result = activate_plugin($plugin);
 
-        $DEBUG['guided-setup']['plugins_active'][0] = $this->all_plugins_active() ? true : false;
-
-        // if ($this->all_plugins_active()) update_option('docc_setup_status', '(1/3) Guided Setup');
-        // else update_option('docc_setup_status', '(0/3) Setup In Progress');
+        if (is_wp_error($activation_result))
+        {
+            $DEBUG['guided-setup']['plugins_active'][0] = false;
+            $DEBUG['guided-setup']['plugins_active'][1][] = "ERROR: Unable to activate plugin. " . $activation_result->get_error_message();
+        }
+        else
+        {
+            $DEBUG['guided-setup']['plugins_active'][0] = $this->all_plugins_active();
+        }
+    
+        update_option('docc_debug', $DEBUG);
 
         wp_die();
     }
@@ -955,11 +994,6 @@ class Docc_Admin extends Docc_Controller
         return is_plugin_active($plugin_slug) ?: false;
     }
 
-    private function get_slug_from_base(string $plugin_slug)
-    {
-        return explode("/", $plugin_slug)[0];
-    }
-
     private function all_plugins_installed()
     {
         foreach ($this->plugin_names as $plugin_slug => $plugin_name)
@@ -991,11 +1025,7 @@ class Docc_Admin extends Docc_Controller
 
     public function activated_plugin()
     {
-        $debug_info = get_option('docc_debug');
-
-        if (false === $debug_info) add_option('docc_debug');
-
-        $DEBUG = [
+        $default_debug = [
             'guided-setup' => [
                 'theme_installed' => [false, []],
                 'theme_active' => [false, []],
@@ -1009,20 +1039,17 @@ class Docc_Admin extends Docc_Controller
                 'email-validated' => [false, []]
             ]
         ];
-        update_option('docc_debug', $DEBUG);
 
-        $status = get_option('docc_setup_status');
+        update_option('docc_debug', get_option('docc_debug', $default_debug));
 
-        if (false === $status) add_option('docc_setup_status');
-
-        if ("(3/3) Setup Complete" === $status)
-        {
-            // TODO: display message that setup has been completed, redirecting to dashboard  (timeout secs)
-            exit(wp_redirect(admin_url('admin.php?page=setup-complete')));
+        $setup_status = get_option('docc_setup_status');
+        if ($setup_status !== "(3/3) Setup Complete") {
+            $setup_status = '(0/3) Setup In Progress';
+            update_option('docc_setup_status', $setup_status);
         }
 
-        update_option('docc_setup_status', '(0/3) Setup In Progress');
-        exit(wp_redirect(admin_url('admin.php?page=' . $this->menu_slug)));
+        $redirect_page = $setup_status === "(3/3) Setup Complete" ? 'setup-complete' : $this->menu_slug;
+        exit(wp_redirect(admin_url('admin.php?page=' . $redirect_page)));
     }
 
     /** Helper function to determine if a user's name is set */
@@ -1057,36 +1084,39 @@ class Docc_Admin extends Docc_Controller
 
     public function admin_init()
     {
-        if (
-            is_admin()
-            && !current_user_can('administrator')
-            && !(defined('DOING_AJAX') && DOING_AJAX)
-        )
+        if (is_admin() && !current_user_can('administrator') && !(defined('DOING_AJAX') && DOING_AJAX))
         {
             wp_redirect(home_url());
             exit;
         }
 
-        if (isset($_GET['post']) && (isset($_GET['action']) && $_GET['action'] == 'edit'))
-        {
-            $post = get_post($_GET['post']);
+        $this->handle_program_edit();
+    }
 
-            if ($post->post_type == 'program')
-            {
-                $directors = get_post_meta($post->ID, 'directors', true);
-                $faculty = get_post_meta($post->ID, 'faculty', true);
-                $residents = get_post_meta($post->ID, 'residents', true);
+    private function handle_program_edit()
+    {
+        if (!isset($_GET['post'], $_GET['action']) || $_GET['action'] !== 'edit') return;
 
-                foreach ($directors as $id) $director_ids[] = strval($id);
-                update_post_meta($post->ID, 'director_ids', $director_ids);
+        $post_id = $_GET['post'];
+        $post = get_post($post_id);
 
-                foreach ($faculty as $id) $faculty_ids[] = strval($id);
-                update_post_meta($post->ID, 'faculty_ids', $faculty_ids);
+        if (!$post || $post->post_type !== 'program') return;
 
-                foreach ($residents as $id) $resident_ids[] = strval($id);
-                update_post_meta($post->ID, 'resident_ids', $resident_ids);
-            }
+        $this->update_program_metadata($post_id, 'directors');
+        $this->update_program_metadata($post_id, 'faculty');
+        $this->update_program_metadata($post_id, 'residents');
+    }
+
+    private function update_program_metadata($post_id, $meta_key)
+    {
+        $meta_values = get_post_meta($post_id, $meta_key, true);
+
+        if (!is_array($meta_values)) {
+            return;
         }
+
+        $updated_ids = array_map('strval', $meta_values);
+        update_post_meta($post_id, "{$meta_key}_ids", $updated_ids);
     }
 
     function extra_user_profile_fields($user)
@@ -1145,7 +1175,7 @@ class Docc_Admin extends Docc_Controller
                 'plugin' => $name,
                 'slug' => $slug,
                 'version' => $this->get_plugin_version($slug),
-                'latest_version' => $this->get_plugin_latest_version($this->get_slug_from_base($slug)),
+                'latest_version' => $this->get_plugin_latest_version($this->GetSlugFromBase($slug)),
                 'required' => $this->is_plugin_required($slug),
                 'installed' => $this->get_plugin_install_status($slug),
                 'active' => $this->get_plugin_active_status($slug),

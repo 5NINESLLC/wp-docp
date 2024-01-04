@@ -60,6 +60,11 @@ abstract class Wordpress_Controller extends Controller
 
         return end($requested_url_explode);
     }
+    
+    private function GetSlugFromBase(string $plugin_slug): string
+    {
+        return explode("/", $plugin_slug)[0];
+    }
 
     protected function GetSlugOfRequestedPage(): string
     {
