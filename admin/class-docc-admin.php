@@ -101,6 +101,27 @@ class Docc_Admin extends Docc_Controller
         wp_enqueue_script($this->plugin_name . "-admin", plugin_dir_url(__FILE__) . 'js/docc-admin.js', ['jquery'], $this->version, false);
     }
 
+    private function get_setup_status(): int
+    {
+        switch (get_option('docc_setup_status'))
+        {
+            case '(0/3) Setup In Progress':
+                return 1;
+            case '(1/3) Guided Setup':
+                return 2;
+            case '(2/3) Automatic Setup':
+                return 3;
+            case '(2/3) Test Support Email (Optional)':
+                return 4;
+            case '(3/3) Test Email':
+                return 5;
+            case '(3/3) Setup Complete':
+                return 6;
+        }
+
+        return 0;
+    }
+
     public function wp_die_ajax_handler($function)
     {
         $error = error_get_last();
@@ -174,27 +195,6 @@ class Docc_Admin extends Docc_Controller
         echo wp_json_encode($response);
     }
 
-    private function get_setup_status(): int
-    {
-        switch (get_option('docc_setup_status'))
-        {
-            case '(0/3) Setup In Progress':
-                return 1;
-            case '(1/3) Guided Setup':
-                return 2;
-            case '(2/3) Automatic Setup':
-                return 3;
-            case '(2/3) Test Support Email (Optional)':
-                return 4;
-            case '(3/3) Test Email':
-                return 5;
-            case '(3/3) Setup Complete':
-                return 6;
-        }
-
-        return 0;
-    }
-
     public function guided_setup_page()
     {
         $status = get_option('docc_setup_status');
@@ -261,15 +261,6 @@ class Docc_Admin extends Docc_Controller
         }
     }
 
-    private function wordpress_is_installed_in_subdirectory(): bool
-    {
-        if (get_option('siteurl') !== get_option('home')) return true;
-
-        if (strlen(rtrim(home_url('/', 'relative'), '/')) > 0) return true;
-
-        return false;
-    }
-
     public function menu_page_docc_setup()
     {
         echo $this->Partial("admin/partials/setup/docc_setup.html");
@@ -282,6 +273,15 @@ class Docc_Admin extends Docc_Controller
         $subdirectory = $this->wordpress_is_installed_in_subdirectory();
 
         echo $this->Partial("admin/partials/setup/guided_setup.php", compact("themes", "plugins", "subdirectory"));
+    }
+
+    private function wordpress_is_installed_in_subdirectory(): bool
+    {
+        if (get_option('siteurl') !== get_option('home')) return true;
+
+        if (strlen(rtrim(home_url('/', 'relative'), '/')) > 0) return true;
+
+        return false;
     }
 
     public function menu_page_automatic_setup()
@@ -443,6 +443,15 @@ class Docc_Admin extends Docc_Controller
         wp_die();
     }
 
+    private function all_plugins_installed()
+    {
+        foreach ($this->plugin_names as $plugin_slug => $plugin_name)
+        {
+            if (!$this->get_plugin_install_status($plugin_slug)) return false;
+        }
+        return true;
+    }
+
     public function wp_ajax_activate_plugin()
     {
         $DEBUG = get_option('docc_debug', []);
@@ -451,6 +460,7 @@ class Docc_Admin extends Docc_Controller
 
         if (!$plugin)
         {
+            $DEBUG['guided-setup']['plugins_active'][0] = false;
             $DEBUG['guided-setup']['plugins_active'][1][] = "WARNING: Function called without plugin defined.";
             update_option('docc_debug', $DEBUG);
 
@@ -459,7 +469,9 @@ class Docc_Admin extends Docc_Controller
 
         if (!is_string($plugin))
         {
+            $DEBUG['guided-setup']['plugins_active'][0] = false;
             $DEBUG['guided-setup']['plugins_active'][1][] = "WARNING: Tried to install plugin with invalid format i.e. not a string.";
+            update_option('docc_debug', $DEBUG);
 
             wp_die();
         }
@@ -483,6 +495,15 @@ class Docc_Admin extends Docc_Controller
         wp_die();
     }
 
+    private function all_plugins_active()
+    {
+        foreach ($this->plugin_names as $plugin_slug => $plugin_name)
+        {
+            if (!$this->get_plugin_active_status($plugin_slug)) return false;
+        }
+        return true;
+    }
+
     public function wp_ajax_setup_status()
     {
 
@@ -500,17 +521,19 @@ class Docc_Admin extends Docc_Controller
             'observer' => 'Observer',
             'program_director' => 'Program Director'
         ];
-        foreach ($roles as $role => $display_name)
-        {
+
+        foreach ($roles as $role => $display_name) {
+            if (get_role($role)) continue;
+    
             $added_role = add_role($role, $display_name, ['read' => true]);
-            if (is_null($added_role))
-            {
-            } // TODO: Add to debug info, role already exists
+            if (is_null($added_role)) {
+                $DEBUG = get_option('docc_debug', []);
+                $DEBUG['guided-setup']['add_user_roles'][0] = false;
+                $DEBUG['guided-setup']['add_user_roles'][1][] = "ERROR: Unable to add role '$role'.";
+                update_option('docc_debug', $DEBUG);
+            }
         }
-        foreach ($roles as $role => $display)
-        {
-            if (is_null(get_role($role))) wp_die('AJAX error', 500);
-        }
+        
         wp_die();
     }
 
@@ -518,23 +541,29 @@ class Docc_Admin extends Docc_Controller
     {
         add_filter('wp_die_ajax_handler', [$this, 'wp_die_ajax_handler'], 100);
 
-        ob_start(); // TODO: This isn't stopping the debug output from the importer...
-
-        // throw new Exception("Menu configuration failed123.");
-        $this->_requireImportClasses();
-
         $wordpress_import = $this->plugin_path . 'admin/dependencies/files/docc.ImportWordpress.xml';
 
-        if (!file_exists($wordpress_import)) wp_die('AJAX error', 500);
+        if (!file_exists($wordpress_import))
+        {
+            $DEBUG = get_option('docc_debug', []);
+            $DEBUG['guided-setup']['import_pages'][0] = false;
+            $DEBUG['guided-setup']['import_pages'][1][] = "ERROR: File not found at $wordpress_import.";
+            update_option('docc_debug', $DEBUG);
+            wp_die();
+        }
+
+        $this->_requireImportClasses();
 
         $wp_import = new WP_Import();
-
         $wp_import->fetch_attachments = true;
+        
+        ob_start(); // TODO: This isn't stopping the debug output from the importer...
         $wp_import->import($wordpress_import);
+        ob_get_clean();
 
         $count_menus_fixed = 0;
         $count_menus_error = 0;
-        // throw new Exception("Menu configuration failed.");
+        
         foreach (self::$NavMenus as $slug => $id)
             if (!$this->_menuIdIsCorrect($slug, $id))
                 if ($this->_tryToFixMenuId($slug, $id))
@@ -543,8 +572,6 @@ class Docc_Admin extends Docc_Controller
                     $count_menus_error++;
 
         // TODO: Improve error messaging.
-
-        $content = ob_get_clean();
 
         if ($count_menus_error > 0) throw new Exception('Menus configuration failed.');
 
@@ -637,71 +664,136 @@ class Docc_Admin extends Docc_Controller
 
     public function wp_ajax_import_forms()
     {
+        $DEBUG = get_option('docc_debug', []);
 
         $forms_import = $this->plugin_path . 'admin/dependencies/files/docc.GravityForms.json';
 
-        if (!file_exists($forms_import)) wp_die('AJAX error', 500);
+        if (!file_exists($forms_import))
+        {
+            $DEBUG['guided-setup']['import_forms'][0] = false;
+            $DEBUG['guided-setup']['import_forms'][1][] = "ERROR: File not found at $forms_import.";
+            update_option('docc_debug', $DEBUG);
+            wp_die();
+        }
 
         $forms_json_file = file_get_contents($forms_import);
         $forms_json = json_decode($forms_json_file, true);
 
-        if (!class_exists('GFAPI')) wp_die('AJAX error', 500);
+        if (!class_exists('GFAPI'))
+        {
+            $DEBUG['guided-setup']['import_forms'][0] = false;
+            $DEBUG['guided-setup']['import_forms'][1][] = "ERROR: GFAPI class does not exist.";
+            update_option('docc_debug', $DEBUG);
+            wp_die();
+        }
 
         foreach ($forms_json as $form)
         {
-            $result[] = GFAPI::add_form($form);
+            if (is_wp_error(GFAPI::add_form($form)))
+            {
+                $DEBUG['guided-setup']['import_forms'][0] = false;
+                $DEBUG['guided-setup']['import_forms'][1][] = "ERROR: Unable to import form with title '{$form['title']}'.";
+                update_option('docc_debug', $DEBUG);
+                wp_die();
+            }
         }
+
+        $DEBUG['guided-setup']['import_forms'][0] = true;
+        update_option('docc_debug', $DEBUG);
 
         wp_die();
     }
 
     public function wp_ajax_import_feeds()
     {
-        // TODO: add redundancy check to see if feeds already exist
+        $DEBUG = get_option('docc_debug', []);
 
-        if (!class_exists('GFAPI')) wp_die('AJAX error', 500);
-
-        $user_registration_feeds_import = $this->plugin_path . 'admin/dependencies/files/docc.GravityFormsExportFeeds.UserRegistrationForm.json';
-
-        if (!file_exists($user_registration_feeds_import)) wp_die('AJAX error', 500);
-
-        $user_registration_feeds_json_file = file_get_contents($user_registration_feeds_import);
-        $user_registration_feeds_json = json_decode($user_registration_feeds_json_file, true);
-
-        $user_registration_form = $this->GetGravityFormByTitle("User Registration");
-        $form_id = $user_registration_form['id'];
-
-        foreach ($user_registration_feeds_json as $feed)
+        if (!class_exists('GFAPI'))
         {
-            if (is_array($feed)) $result[] = GFAPI::add_feed($form_id, $feed['meta'], $feed['addon_slug']);
+            $DEBUG['guided-setup']['import_feeds'][0] = false;
+            $DEBUG['guided-setup']['import_feeds'][1][] = "ERROR: GFAPI class does not exist.";
+            update_option('docc_debug', $DEBUG);
+
+            wp_die();
         }
 
-        $invite_user_feeds_import = $this->plugin_path . 'admin/dependencies/files/docc.GravityFormsExportFeeds.InviteUserToProgramForm.json';
-
-        if (!file_exists($invite_user_feeds_import)) wp_die('AJAX error', 500);
-
-        $invite_user_feeds_json_file = file_get_contents($invite_user_feeds_import);
-        $invite_user_feeds_json = json_decode($invite_user_feeds_json_file, true);
-
-        $invite_user_form = $this->GetGravityFormByTitle("Invite User to Program");
-        $form_id = $invite_user_form['id'];
-
-        foreach ($invite_user_feeds_json as $feed)
-        {
-            $result[] = GFAPI::add_feed($form_id, $feed['meta'], $feed['addon_slug']);
-        }
+        $this->importFeedsFromFile('docc.GravityFormsExportFeeds.UserRegistrationForm.json', "User Registration");
+        $this->importFeedsFromFile('docc.GravityFormsExportFeeds.InviteUserToProgramForm.json', "Invite User to Program");
 
         wp_die();
+    }
+    
+    private function importFeedsFromFile($fileName, $formTitle)
+    {
+        $DEBUG = get_option('docc_debug', []);
+        
+        $filePath = $this->plugin_path . 'admin/dependencies/files/' . $fileName;
+    
+        if (!file_exists($filePath)) {
+            $DEBUG['guided-setup']['import_feeds'][0] = false;
+            $DEBUG['guided-setup']['import_feeds'][1][] = "ERROR: File not found at $filePath.";
+            update_option('docc_debug', $DEBUG);
+
+            wp_die();
+        }
+    
+        $feeds_json_file = file_get_contents($filePath);
+        $feeds_json = json_decode($feeds_json_file, true);
+    
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $DEBUG['guided-setup']['import_feeds'][0] = false;
+            $DEBUG['guided-setup']['import_feeds'][1][] = "ERROR: Failed to decode JSON file '$fileName'.";
+            update_option('docc_debug', $DEBUG);
+
+            wp_die();
+        }
+    
+        $form = $this->GetGravityFormByTitle($formTitle);
+        if (is_null($form))
+        {
+            $DEBUG['guided-setup']['import_feeds'][0] = false;
+            $DEBUG['guided-setup']['import_feeds'][1][] = "ERROR: Form with title '$formTitle' not found.";
+            update_option('docc_debug', $DEBUG);
+
+            wp_die();
+        }
+    
+        foreach ($feeds_json as $feed)
+        {
+            if ($this->feedAlreadyExists($feed, $form['id'])) continue;
+    
+            if (is_array($feed))
+            {
+                if (is_wp_error(GFAPI::add_feed($form['id'], $feed['meta'], $feed['addon_slug'])))
+                {
+                    $DEBUG['guided-setup']['import_feeds'][0] = false;
+                    $DEBUG['guided-setup']['import_feeds'][1][] = "ERROR: Unable to import feed with title '{$feed['meta']['feedName']}'.";
+                    update_option('docc_debug', $DEBUG);
+
+                    wp_die();
+                }
+            }
+        }
+    }
+
+    private function feedAlreadyExists($feed, $form_id)
+    {
+        $existing_feeds = GFAPI::get_feeds(null, $form_id, $feed['addon_slug']);
+        foreach ($existing_feeds as $existing_feed) {
+            if ($existing_feed['meta'] == $feed['meta']) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function gf_id()
     {
-
         if (!isset($_POST['title']) || trim($_POST['title']) === '') wp_die();
 
-        $new_observation_form = $this->GetGravityFormByTitle($_POST['title']);
+        $form = $this->GetGravityFormByTitle($_POST['title']);
 
-        echo $new_observation_form['id'];
+        echo $form['id'];
 
         wp_die();
     }
@@ -731,7 +823,7 @@ class Docc_Admin extends Docc_Controller
         // $nav_menu_roles_import_file = $this->plugin_path . 'admin/dependencies/files/docc.importWordpress.xml';
         // if (file_exists($nav_menu_roles_import_file)) $this->import_nav_menu_roles($nav_menu_roles_import_file);
 
-        // TODO: Apple role-based header restrictions
+        // TODO: Apply role-based header restrictions
         update_option('docc_setup_status', '(2/3) Automatic Setup');
 
         wp_die();
@@ -747,7 +839,7 @@ class Docc_Admin extends Docc_Controller
         wp_die();
     }
 
-    private function import_nav_menu_roles($file)
+    /*private function import_nav_menu_roles($file)
     {
 
         define('WP_LOAD_IMPORTERS', true);
@@ -765,11 +857,10 @@ class Docc_Admin extends Docc_Controller
         $nav_menu_roles_import = new Nav_Menu_Roles_Import();
 
         $nav_menu_roles_import->import($file);
-    }
+    }*/
 
     public function wp_ajax_rerun_automatic_setup()
     {
-
         update_option('page_on_front', '0');
         update_option('show_on_front', 'posts');
 
@@ -827,35 +918,24 @@ class Docc_Admin extends Docc_Controller
 
         delete_option('docc_as_error_log');
         update_option('docc_setup_status', '(1/3) Guided Setup');
-
-        // exit(wp_redirect(admin_url('admin.php?page=auto-setup')));
-
     }
 
     public function wp_ajax_setup_support_email()
     {
-        // check for global debug info
-        $DEBUG = get_option('docc_debug');
+        $DEBUG = get_option('docc_debug', []);
 
-        if (!isset($_POST['sender']) || trim($_POST['sender']) === '')
-        {
+        $sender = isset($_POST['sender']) ? filter_var(trim($_POST['sender']), FILTER_SANITIZE_EMAIL) : '';
+        $msg = isset($_POST['msg']) ? filter_var($_POST['msg'], FILTER_SANITIZE_STRING) : '';
 
-            $DEBUG['test-email']['setup-errors'][1][] = "WARNING: Function called without sender defined.";
-
+        if (!$sender || !filter_var($sender, FILTER_VALIDATE_EMAIL) || !$msg) {
+            $error_message = !$sender ? "Function called without sender defined." : "Invalid sender email.";
+            $error_message = !$msg ? "Function called without message defined." : $error_message;
+            $DEBUG['test-email']['setup-errors'][0] = false;
+            $DEBUG['test-email']['setup-errors'][1][] = "WARNING: " . $error_message;
+            update_option('docc_debug', $DEBUG);
+            
             wp_die();
         }
-
-        $sender = filter_var($_POST['sender'], FILTER_SANITIZE_EMAIL);
-
-        if (!isset($_POST['msg']))
-        {
-
-            $DEBUG['test-email']['setup-errors'][1][] = "WARNING: Function called without message defined.";
-
-            wp_die();
-        }
-
-        $msg = filter_var($_POST['msg'], FILTER_SANITIZE_STRING);
 
         $to = 'support@design.garden';
         $subject = 'DOCC user setup error';
@@ -865,163 +945,69 @@ class Docc_Admin extends Docc_Controller
         $headers  = 'MIME-Version: 1.0' . "\r\n";
         $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 
-        $result = wp_mail($to, $subject, $message, $headers);
-
-        if ($result)
-        {
-
+        if (wp_mail($to, $subject, $message, $headers)) {
             $DEBUG['test-email']['setup-errors'][0] = true;
-
             update_option('docc_setup_status', '(2/3) Test Support Email (Optional)');
-        }
-        else
-        {
-
+        } else {
             $DEBUG['test-email']['setup-errors'][0] = false;
             $DEBUG['test-email']['setup-errors'][1][] = "ERROR: Server could not send email with debug info.";
-
             update_option('docc_setup_status', '(2/3) Automatic Setup');
         }
+
+        update_option('docc_debug', $DEBUG);
 
         wp_die();
     }
 
     public function wp_ajax_test_email()
     {
+        $DEBUG = get_option('docc_debug', []);
 
-        if (!isset($_POST['email']) || trim($_POST['email']) === '')
-        {
-
-            $DEBUG['test-email']['email-validated'][1][] = "WARNING: Function called without email defined.";
-
+        $to = isset($_POST['email']) ? filter_var(trim($_POST['email']), FILTER_SANITIZE_EMAIL) : '';
+        if (!$to || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
+            $DEBUG['test-email']['email-validated'][0] = false;
+            $DEBUG['test-email']['email-validated'][1][] = "WARNING: Invalid or undefined email.";
+            update_option('docc_debug', $DEBUG);
             wp_die();
         }
 
-        // multiple recipients
-        $to  = $_POST['email'];
-
-        // subject
         $current_email = wp_get_current_user()->user_email;
-        $email_is_same_as_admin = ($current_email == $to) ? true : false;
-        $subject = $email_is_same_as_admin ? "Setting up email for you new DOCC installation" : "Register a Program Director for you DOCC installation";
-
-        $registration_link = get_site_url(null, 'register/?email=' . $to . '&role=Program%20Director');
+        $email_is_same_as_admin = ($current_email === $to);
+        $subject = $email_is_same_as_admin ? "Setting up email for your new DOCC installation" : "Register a Program Director for your DOCC installation";
+    
+        $registration_link = get_site_url(null, 'register/?email=' . urlencode($to) . '&role=Program%20Director');
         $logout_link = wp_logout_url($registration_link);
-
         $message = $this->Partial("admin/partials/mail/test_email.php", compact("registration_link", "logout_link"));
-
-        // To send HTML mail, the Content-type header must be set
+    
         $headers  = 'MIME-Version: 1.0' . "\r\n";
         $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 
-        $result = wp_mail($to, $subject, $message, $headers);
-
-        if ($result)
-        {
-
+        if (wp_mail($to, $subject, $message, $headers)) {
             $DEBUG['test-email']['email-validated'][0] = true;
-
             update_option('docc_setup_status', '(3/3) Test Email');
-        }
-        else
-        {
-
+        } else {
             $DEBUG['test-email']['email-validated'][0] = false;
             $DEBUG['test-email']['email-validated'][1][] = "ERROR: Server could not send test email to $to.";
-
             update_option('docc_setup_status', '(2/3) Automatic Setup');
         }
+
+        update_option('docc_debug', $DEBUG);
 
         wp_die();
     }
 
     public function wp_ajax_setup_complete()
     {
-        // $GLOBALS["docc_setup_complete"] = date('Y-m-d');
-        // define('DOCC_SETUP_COMPLETE', date('Y-m-d'));
-        // var_dump(defined('DOCC_SETUP_COMPLETE'));
-
         update_option('docc_setup_status', "(3/3) Setup Complete");
 
         wp_die();
     }
 
-    public function get_setting()
+    /*public function get_setting()
     {
         var_dump(get_option('docc_setup_status'));
         wp_die();
-    }
-
-    /** Dependency information */
-    private function get_theme_install_status(string $name)
-    {
-        $theme = wp_get_theme($name);
-        return $theme->exists() ?: false;
-    }
-
-    private function get_theme_active_status(string $name)
-    {
-        return (wp_get_theme()->name === $name) ? true : false;
-    }
-
-    private function get_plugin_version(string $plugin_slug)
-    {
-        $fullpath = WP_PLUGIN_DIR . '/' . $plugin_slug;
-        if (!file_exists($fullpath)) return '';
-        $data = get_plugin_data($fullpath, false, false);
-        return $data['Version'] ?: '';
-    }
-
-    private function get_plugin_latest_version(string $plugin_slug)
-    {
-        include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
-        $api = plugins_api('plugin_information', ['slug' => $plugin_slug, 'fields' => ['sections' => false]]);
-        if (is_wp_error($api) || !property_exists($api, "version"))
-        {
-            return false;
-        }
-        return $api->version ?: '';
-    }
-
-    private function get_plugin_install_status(string $plugin_slug)
-    {
-        $installed_plugins = get_plugins();
-        return (array_key_exists($plugin_slug, $installed_plugins) || in_array($plugin_slug, $installed_plugins, true)) ? true : false;
-    }
-
-    private function get_plugin_active_status(string $plugin_slug)
-    {
-        return is_plugin_active($plugin_slug) ?: false;
-    }
-
-    private function all_plugins_installed()
-    {
-        foreach ($this->plugin_names as $plugin_slug => $plugin_name)
-        {
-            if (!$this->get_plugin_install_status($plugin_slug)) return false;
-        }
-        return true;
-    }
-
-    private function all_plugins_active()
-    {
-        foreach ($this->plugin_names as $plugin_slug => $plugin_name)
-        {
-            if (!$this->get_plugin_active_status($plugin_slug)) return false;
-        }
-        return true;
-    }
-
-    private function is_plugin_required($slug)
-    {
-        $plugins = [
-            'gravityformswebhooks/webhooks.php' => false,
-            'GFChart/gfchart.php' => false,
-            'styles-and-layouts-for-gravity-forms/styles-layouts-gravity-forms.php' => false
-        ];
-
-        return !array_key_exists($slug, $plugins);
-    }
+    }*/
 
     public function activated_plugin()
     {
@@ -1052,16 +1038,7 @@ class Docc_Admin extends Docc_Controller
         exit(wp_redirect(admin_url('admin.php?page=' . $redirect_page)));
     }
 
-    /** Helper function to determine if a user's name is set */
-    function name_is_set($name)
-    {
-        if ($name == "") return false;
-        if (is_null($name)) return false;
-        return true;
-    }
-
-    /** Use to test data for resident name dropdown on new-observation form */
-    function wp_ajax_add_residents_test()
+    /*public function wp_ajax_add_residents_test()
     {
         // $users = get_users( [ 'role' => 'resident' ] );
         // foreach ($users as $user) {
@@ -1071,7 +1048,7 @@ class Docc_Admin extends Docc_Controller
         //     var_dump($user);
         //     echo $last;
         //     echo strlen($last);
-        //     if (self::name_is_set($first) && self::name_is_set($last)) {
+        //     if ($this->NameIsSet($first) && $this->NameIsSet($last)) {
         //         echo $first . " " . $last;
         //     } else {
         //         echo "no name";
@@ -1080,7 +1057,7 @@ class Docc_Admin extends Docc_Controller
         // }
 
         // wp_die();
-    }
+    }*/
 
     public function admin_init()
     {
@@ -1119,7 +1096,7 @@ class Docc_Admin extends Docc_Controller
         update_post_meta($post_id, "{$meta_key}_ids", $updated_ids);
     }
 
-    function extra_user_profile_fields($user)
+    public function extra_user_profile_fields($user)
     {
         $programs = Docc_Programs_GF::get_user_programs($user);
         $program_titles = [];
@@ -1130,7 +1107,7 @@ class Docc_Admin extends Docc_Controller
         echo $this->Partial("admin/partials/profile/extra_user_profile_fields.php", compact("user", "program_titles"));
     }
 
-    function get_password_reset_link()
+    public function get_password_reset_link()
     {
         if (!(isset($_GET) && isset($_GET['user_id']))) return;
 
@@ -1184,6 +1161,47 @@ class Docc_Admin extends Docc_Controller
         return $ret;
     }
 
+    private function get_plugin_version(string $plugin_slug)
+    {
+        $fullpath = WP_PLUGIN_DIR . '/' . $plugin_slug;
+        if (!file_exists($fullpath)) return '';
+        $data = get_plugin_data($fullpath, false, false);
+        return $data['Version'] ?: '';
+    }
+
+    private function get_plugin_latest_version(string $plugin_slug)
+    {
+        include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+        $api = plugins_api('plugin_information', ['slug' => $plugin_slug, 'fields' => ['sections' => false]]);
+        if (is_wp_error($api) || !property_exists($api, "version"))
+        {
+            return false;
+        }
+        return $api->version ?: '';
+    }
+
+    private function is_plugin_required($slug)
+    {
+        $plugins = [
+            'gravityformswebhooks/webhooks.php' => false,
+            'GFChart/gfchart.php' => false,
+            'styles-and-layouts-for-gravity-forms/styles-layouts-gravity-forms.php' => false
+        ];
+
+        return !array_key_exists($slug, $plugins);
+    }
+
+    private function get_plugin_install_status(string $plugin_slug)
+    {
+        $installed_plugins = get_plugins();
+        return (array_key_exists($plugin_slug, $installed_plugins) || in_array($plugin_slug, $installed_plugins, true)) ? true : false;
+    }
+
+    private function get_plugin_active_status(string $plugin_slug)
+    {
+        return is_plugin_active($plugin_slug) ?: false;
+    }
+
     protected function GetThemes(): array
     {
         $ret = [];
@@ -1199,5 +1217,16 @@ class Docc_Admin extends Docc_Controller
             ];
         }
         return $ret;
+    }
+    
+    private function get_theme_install_status(string $name)
+    {
+        $theme = wp_get_theme($name);
+        return $theme->exists() ?: false;
+    }
+
+    private function get_theme_active_status(string $name)
+    {
+        return (wp_get_theme()->name === $name) ? true : false;
     }
 }

@@ -215,16 +215,14 @@ class Docc
         
         $this->loader->add_action('wp_ajax_install_plugin', $plugin_admin, 'wp_ajax_install_plugin');
         $this->loader->add_action('wp_ajax_activate_plugin', $plugin_admin, 'wp_ajax_activate_plugin');
+
         $this->loader->add_action('wp_ajax_setup_status', $plugin_admin, 'wp_ajax_setup_status');
 
         $this->loader->add_action('wp_ajax_add_user_roles', $plugin_admin, 'wp_ajax_add_user_roles');
-        // $this->loader->add_action( 'wp_ajax_nopriv_add_user_roles', $plugin_admin, 'wp_ajax_add_user_roles' );
         $this->loader->add_action('wp_ajax_import_pages', $plugin_admin, 'wp_ajax_import_pages');
-        $this->loader->add_action('wp_ajax_nopriv_import_pages', $plugin_admin, 'wp_ajax_import_pages');
         $this->loader->add_action('wp_ajax_import_forms', $plugin_admin, 'wp_ajax_import_forms');
         $this->loader->add_action('wp_ajax_import_feeds', $plugin_admin, 'wp_ajax_import_feeds');
         $this->loader->add_action('wp_ajax_misc_settings', $plugin_admin, 'wp_ajax_misc_settings');
-        // $this->loader->add_action( 'wp_ajax_nopriv_import_nav_menu_roles', $plugin_admin, 'wp_ajax_import_nav_menu_roles' );
 
         $this->loader->add_action('wp_ajax_setup_support_email', $plugin_admin, 'wp_ajax_setup_support_email');
         $this->loader->add_action('wp_ajax_rerun_automatic_setup', $plugin_admin, 'wp_ajax_rerun_automatic_setup');
@@ -235,14 +233,18 @@ class Docc
         $this->loader->add_action('show_user_profile', $plugin_admin, 'extra_user_profile_fields');
         $this->loader->add_action('edit_user_profile', $plugin_admin, 'extra_user_profile_fields');
 
-        $this->loader->add_action('wp_ajax_nopriv_get_setting', $plugin_admin, 'get_setting');
-        $this->loader->add_action('wp_ajax_nopriv_delete_pages', $plugin_admin, 'wp_ajax_delete_pages');
-
         $this->loader->add_action('wp_ajax_gf_id', $plugin_admin, 'gf_id');
 
         $this->loader->add_action('wp_ajax_as_error_log', $plugin_admin, 'as_error_log');
 
         $this->loader->add_action('wp_ajax_get_password_reset_link', $plugin_admin, 'get_password_reset_link');
+
+        // TESTING
+        // $this->loader->add_action( 'wp_ajax_nopriv_add_user_roles', $plugin_admin, 'wp_ajax_add_user_roles' );
+        // $this->loader->add_action('wp_ajax_nopriv_import_pages', $plugin_admin, 'wp_ajax_import_pages');
+        // $this->loader->add_action( 'wp_ajax_nopriv_import_nav_menu_roles', $plugin_admin, 'wp_ajax_import_nav_menu_roles' );
+        // $this->loader->add_action('wp_ajax_nopriv_get_setting', $plugin_admin, 'get_setting');
+        
     }
 
     /**

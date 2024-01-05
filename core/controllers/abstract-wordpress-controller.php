@@ -61,7 +61,7 @@ abstract class Wordpress_Controller extends Controller
         return end($requested_url_explode);
     }
     
-    private function GetSlugFromBase(string $plugin_slug): string
+    protected function GetSlugFromBase(string $plugin_slug): string
     {
         return explode("/", $plugin_slug)[0];
     }
@@ -92,6 +92,13 @@ abstract class Wordpress_Controller extends Controller
         if (in_array($role, (array) $current_user->roles)) return true;
 
         return false;
+    }
+
+    protected function NameIsSet($name)
+    {
+        if ($name == "") return false;
+        if (is_null($name)) return false;
+        return true;
     }
 
     /**

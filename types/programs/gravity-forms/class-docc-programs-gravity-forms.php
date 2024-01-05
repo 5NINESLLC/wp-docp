@@ -326,7 +326,7 @@ class Docc_Programs_GF extends Docc_Controller
                             $email = $user->user_email;
                             $first = $meta['first_name'][0];
                             $last = $meta['last_name'][0];
-                            if ($this->name_is_set($first) && $this->name_is_set($last)) {
+                            if ($this->NameIsSet($first) && $this->NameIsSet($last)) {
                                 $choices[] = ['text' => $email . " (" . $first . " " . $last . ")", 'value' => $email];
                             } else {
                                 $choices[] = ['text' => $email, 'value' => $email];
@@ -361,13 +361,6 @@ class Docc_Programs_GF extends Docc_Controller
             if (is_array($residents) && in_array($user->ID, $residents)) $programs[] = $program;
         }
         return $programs;
-    }
-
-    public function name_is_set($name)
-    {
-        if ($name == "") return false;
-        if (is_null($name)) return false;
-        return true;
     }
 
     public function user_register($user_id)
