@@ -198,7 +198,6 @@ class Docc
      */
     private function define_admin_hooks()
     {
-
         $plugin_admin = new Docc_Admin($this->get_plugin_name(), $this->get_version(), $this->plugin_url, $this->get_plugin_path());
 
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
@@ -206,7 +205,7 @@ class Docc
 
         $this->loader->add_action('admin_init', $plugin_admin, 'admin_init');
 
-        $this->loader->add_action('admin_menu', $plugin_admin, 'guided_setup_page');
+        $this->loader->add_action('admin_menu', $plugin_admin, 'docc_admin_page');
 
         $this->loader->add_action('activated_plugin', $plugin_admin, 'activated_plugin');
 
@@ -244,7 +243,6 @@ class Docc
         // $this->loader->add_action('wp_ajax_nopriv_import_pages', $plugin_admin, 'wp_ajax_import_pages');
         // $this->loader->add_action( 'wp_ajax_nopriv_import_nav_menu_roles', $plugin_admin, 'wp_ajax_import_nav_menu_roles' );
         // $this->loader->add_action('wp_ajax_nopriv_get_setting', $plugin_admin, 'get_setting');
-        
     }
 
     /**
@@ -362,7 +360,6 @@ class Docc
 
         $this->loader->add_shortcode('new_program', $programs_shortcodes, 'display_new_program_form');
         $this->loader->add_shortcode('program_registration', $programs_shortcodes, 'display_program_registration_form');
-
 
         $this->loader->add_shortcode('gf', $programs_shortcodes, 'display_gf', 10, 1);
         $this->loader->add_shortcode('programs', $programs_shortcodes, 'display_director_programs');

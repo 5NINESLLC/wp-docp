@@ -46,7 +46,7 @@ class Docc_Admin extends Docc_Controller
         'wp-post-modal/wp-post-modal.php' => 'WP Post Popup'
     ];
 
-    private $menu_slug = "docc-setup";
+    private $menu_slug = "docc-settings";
 
     private static $NavMenus = ["admin-menu" => 9, "default-menu" => 10, "main-menu" => 11, "resident-menu" => 12];
 
@@ -195,7 +195,7 @@ class Docc_Admin extends Docc_Controller
         echo wp_json_encode($response);
     }
 
-    public function guided_setup_page()
+    public function docc_admin_page()
     {
         $status = get_option('docc_setup_status');
         $isSetupInProgress = $status === '(0/3) Setup In Progress';
@@ -203,13 +203,43 @@ class Docc_Admin extends Docc_Controller
         $isSetupComplete = $status === '(3/3) Setup Complete';
 
         add_menu_page(
-            'Install Dependencies',
-            'DOCC Setup',
+            'DOCC',
+            'DOCC',
             'manage_options',
             $this->menu_slug,
-            [$this, 'menu_page_guided_setup'],
+            [$this, 'menu_page_settings'],
             'dashicons-welcome-widgets-menus',
             1
+        );
+        
+        remove_submenu_page($this->menu_slug, $this->menu_slug);
+
+        add_submenu_page(
+            $this->menu_slug, 
+            'Settings', 
+            'Settings', 
+            'manage_options', 
+            $this->menu_slug, 
+            [$this, 'menu_page_settings'],
+            2
+        );
+        add_submenu_page(
+            $this->menu_slug, 
+            'MFA', 
+            'MFA', 
+            'manage_options', 
+            'MFA', 
+            [$this, 'menu_page_MFA'],
+            2
+        );
+        add_submenu_page(
+            $this->menu_slug,
+            'DOCC Setup',
+            'DOCC Setup',
+            'manage_options',
+            'setup',
+            [$this, 'menu_page_guided_setup'],
+            2
         );
         if (!$isSetupInProgress && !$isSetupComplete)
         {
@@ -220,7 +250,7 @@ class Docc_Admin extends Docc_Controller
                 'manage_options',
                 'auto-setup',
                 [$this, 'menu_page_automatic_setup'],
-                2
+                3
             );
         }
         if (!$isSetupInProgress && !$isGuidedSetup && !$isSetupComplete)
@@ -244,7 +274,7 @@ class Docc_Admin extends Docc_Controller
                 'manage_options',
                 'test-email',
                 [$this, 'menu_page_test_email'],
-                4
+                3
             );
         }
         if ($isSetupComplete)
@@ -256,7 +286,7 @@ class Docc_Admin extends Docc_Controller
                 'manage_options',
                 'setup-complete',
                 [$this, 'menu_page_setup_complete'],
-                5
+                3
             );
         }
     }
@@ -264,6 +294,16 @@ class Docc_Admin extends Docc_Controller
     public function menu_page_docc_setup()
     {
         echo $this->Partial("admin/partials/setup/docc_setup.html");
+    }
+
+    public function menu_page_settings()
+    {
+        echo $this->Partial("admin/partials/setup/settings.php");
+    }
+
+    public function menu_page_MFA()
+    {
+        echo $this->Partial("admin/partials/setup/MFA.php");
     }
 
     public function menu_page_guided_setup()
