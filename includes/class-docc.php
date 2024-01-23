@@ -85,6 +85,7 @@ class Docc
         $this->set_locale();
 
         $this->define_programs_hooks();
+        $this->define_data_access_hooks();
 
         if (is_admin() || is_customize_preview())
         {
@@ -95,6 +96,8 @@ class Docc
             $this->define_public_hooks();
             $this->define_shortcode_hooks();
         }
+
+        $this->schedule_cron_jobs();
     }
 
     /**
@@ -105,6 +108,13 @@ class Docc
         require_once $this->plugin_path . 'includes/class-docc-updater.php';
 
         $this->updater = new Docc_Updater();
+    }
+
+    private function schedule_cron_jobs()
+    {
+        if (!wp_next_scheduled('docc_delete_old_data')) {
+            wp_schedule_event(time(), 'daily', 'docc_delete_old_data');
+        }
     }
 
     /**
@@ -168,6 +178,8 @@ class Docc
         require_once $this->plugin_path . 'types/programs/class-docc-programs.php';
         require_once $this->plugin_path . 'types/programs/shortcodes/class-docc-programs-shortcodes.php';
         require_once $this->plugin_path . 'types/programs/gravity-forms/class-docc-programs-gravity-forms.php';
+
+        require_once $this->plugin_path . 'types/data_access/class-docc-data-access.php';
 
         $this->loader = new Docc_Loader();
     }
@@ -366,6 +378,22 @@ class Docc
         $this->loader->add_shortcode('broadcast', $programs_shortcodes, 'display_broadcast_message');
         $this->loader->add_shortcode('user_programs', $programs_shortcodes, 'display_programs_on_dashboard');
         $this->loader->add_shortcode('program_members', $programs_shortcodes, 'display_program_members');
+    }
+
+    private function define_data_access_hooks()
+    {
+        $data_access = new Data_Access($this->get_plugin_name(), $this->get_version(), $this->get_plugin_path(), $this->get_plugin_url(), "types/data_access/partials/");
+
+        $this->loader->add_action('wp_enqueue_scripts', $data_access, 'enqueue_styles');
+        $this->loader->add_action('wp_enqueue_scripts', $data_access, 'enqueue_scripts');
+
+        $this->loader->add_action('docc_delete_old_data', $data_access, 'docc_delete_old_data');
+
+        $this->loader->add_action('wp_ajax_scrub_phi_data', $data_access, 'wp_ajax_scrub_phi_data');
+        $this->loader->add_action('wp_ajax_toggle_delete_old_data', $data_access, 'wp_ajax_toggle_delete_old_data');
+        $this->loader->add_action('wp_ajax_get_delete_old_data_setting', $data_access, 'wp_ajax_get_delete_old_data_setting');
+
+        $this->loader->add_shortcode('observations_with_phi', $data_access, 'observations_with_phi', 10, 1);
     }
 
     /**
