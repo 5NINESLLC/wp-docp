@@ -42,6 +42,13 @@ class Data_Access extends Docc_Controller
         wp_enqueue_script($this->plugin_name . "-data-access", plugin_dir_url(__FILE__) . 'js/docc-data-access.js', array('jquery'), $this->version, false);
     }
 
+    public function disable_new_admins($all_roles)
+    {
+        unset($all_roles['administrator']);
+
+        return $all_roles;
+    }
+
     public function wp_ajax_scrub_phi_data()
     {
         echo $this->get_user_phi_entries();

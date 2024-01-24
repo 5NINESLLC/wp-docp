@@ -387,6 +387,8 @@ class Docc
         $this->loader->add_action('wp_enqueue_scripts', $data_access, 'enqueue_styles');
         $this->loader->add_action('wp_enqueue_scripts', $data_access, 'enqueue_scripts');
 
+        $this->loader->add_action('editable_roles', $data_access, 'disable_new_admins', 10, 1);
+
         $this->loader->add_action('docc_delete_old_data', $data_access, 'docc_delete_old_data');
 
         $this->loader->add_action('wp_ajax_scrub_phi_data', $data_access, 'wp_ajax_scrub_phi_data');
