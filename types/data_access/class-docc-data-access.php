@@ -119,6 +119,7 @@ class Data_Access extends Docc_Controller
             $message .= '<p>No specific PHI details are available, but please review your submission for potential PHI.</p>';
         }
 
+        $message .= '<p>See info about PHI and how our app handles it here: <a href="https://docc.acgme.org/hipaa">HIPAA Compliance</a></p>';
         $message .= '<p>Please be mindful of the information you share and avoid including any sensitive health information in your submissions.</p>';
         $message .= '<p>Thank you for your attention to this important matter.</p>';
         $message .= '</body></html>';
