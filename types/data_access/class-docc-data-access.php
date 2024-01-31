@@ -65,8 +65,6 @@ class Data_Access extends Docc_Controller
 
             if ($phi_entry['contains_phi']) $this->scrub_phi_entry($entry, $phi_entry);
         }
-
-        return $entries;
     }
 
     private function scrub_phi_entry($entry, $phi_entry)
@@ -81,7 +79,51 @@ class Data_Access extends Docc_Controller
 
         GFAPI::update_entry($entry);
 
-        return $entry;
+        $this->send_phi_email($entry, $phi_entry);
+    }
+
+    private function send_phi_email($entry, $phi_entry)
+    {
+        if (!isset($entry['created_by']) || $entry['created_by'] === "") return;
+
+        $user = get_userdata($entry['created_by']);
+        if (!$user) return;
+
+        $to = $user->user_email;
+        $subject = 'An observation you created contains PHI';
+        $message = $this->format_phi_email($entry, $phi_entry);
+        $headers = array('Content-Type: text/html; charset=UTF-8');
+
+        wp_mail($to, $subject, $message, $headers);
+    }
+
+    private function format_phi_email($entry, $phi_entry)
+    {
+        $message = '<html><body>';
+        $message .= '<h1>Alert: PHI Detected in Your Submission</h1>';
+        $message .= '<p>Dear User,</p>';
+        $message .= '<p>We have detected that your recent submission in our system contains Protected Health Information (PHI). For privacy and compliance reasons, we have taken steps to secure this information.</p>';
+
+        if (isset($phi_entry) && !empty($phi_entry)) {
+            $message .= '<p>The following PHI elements were detected in your submission:</p>';
+            $message .= '<ul>';
+
+            foreach ($phi_entry as $field => $phi) {
+                if ($field === 'contains_phi' || empty($phi[1])) continue;
+
+                $message .= '<li>' . $entry[$field] . '</li>';
+            }
+
+            $message .= '</ul>';
+        } else {
+            $message .= '<p>No specific PHI details are available, but please review your submission for potential PHI.</p>';
+        }
+
+        $message .= '<p>Please be mindful of the information you share and avoid including any sensitive health information in your submissions.</p>';
+        $message .= '<p>Thank you for your attention to this important matter.</p>';
+        $message .= '</body></html>';
+
+        return $message;
     }
 
     private function exec_phi_scrubber($entry_text)
@@ -129,11 +171,7 @@ class Data_Access extends Docc_Controller
     {
         $entries = $this->get_daily_phi_entries();
 
-        foreach ($entries as $entry) {
-            $phi_entry = $this->check_for_phi($entry);
-
-            if ($phi_entry['contains_phi']) $this->scrub_phi_entry($entry, $phi_entry);
-        }
+        $this->scrub_user_phi_data($entries);
 
         wp_die();
     }
