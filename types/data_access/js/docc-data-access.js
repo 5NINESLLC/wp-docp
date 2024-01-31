@@ -18,7 +18,7 @@
                     action: 'scrub_phi_data'
                 },
                 success: function(response) {
-                    console.log(response);
+                    location.reload();
                 }
             });
         });
