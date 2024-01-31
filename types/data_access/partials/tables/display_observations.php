@@ -18,17 +18,10 @@
             <th>Resident Email</th>
             <th>Faculty ID</th>
             <th>Faculty Email</th>
-            <th class="hidden-table-entry">History Taking</th>
-            <th class="hidden-table-entry">Physical Examination</th>
-            <th class="hidden-table-entry">Counseling</th>
-            <th class="hidden-table-entry">Breaking Bad News</th>
-            <th class="hidden-table-entry">Clinical Reasoning</th>
-            <th class="hidden-table-entry">Hand-Off</th>
         </tr>
     </thead>
     <tbody>
         <?php
-        $entries = json_decode($entries, true);
         foreach ($entries as $entry) {
             $label = "Program ID";
             $field_id = Docc_Public::GetFieldId($form, $label);
@@ -153,55 +146,6 @@
                     $label = "Faculty Email";
                     $field_id = Docc_Public::GetFieldId($form, $label);
                     echo $entry[$field_id];
-                    ?>
-                </td>
-                <!-- 19 63 64 65 66 67 -->
-                <td class="hidden-table-entry">
-                    <?php
-                    $label = "Based on this single observation of history taking, please provide an overall judgement of this learner.";
-                    $field_id = Docc_Public::GetFieldId($form, $label);
-                    if (!empty($entry[$field_id])) echo $entry[$field_id];
-                    else echo "Not observed";
-                    ?>
-                </td>
-                <td class="hidden-table-entry">
-                    <?php
-                    $label = "Based on this single observation of physical examination, please provide an overall judgement of this learner.";
-                    $field_id = Docc_Public::GetFieldId($form, $label);
-                    if (!empty($entry[$field_id])) echo $entry[$field_id];
-                    else echo "Not observed";
-                    ?>
-                </td>
-                <td class="hidden-table-entry">
-                    <?php
-                    $label = "Based on this single observation of counseling / shared decision making, please provide an overall judgement of this learner.";
-                    $field_id = Docc_Public::GetFieldId($form, $label);
-                    if (!empty($entry[$field_id])) echo $entry[$field_id];
-                    else echo "Not observed";
-                    ?>
-                </td>
-                <td class="hidden-table-entry">
-                    <?php
-                    $label = "Based on this single observation of breaking bad news, please provide an overall judgement of this learner.";
-                    $field_id = Docc_Public::GetFieldId($form, $label);
-                    if (!empty($entry[$field_id])) echo $entry[$field_id];
-                    else echo "Not observed";
-                    ?>
-                </td>
-                <td class="hidden-table-entry">
-                    <?php
-                    $label = "Based on this single observation of clinical reasoning, please provide an overall judgement of this learner.";
-                    $field_id = Docc_Public::GetFieldId($form, $label);
-                    if (!empty($entry[$field_id])) echo $entry[$field_id];
-                    else echo "Not observed";
-                    ?>
-                </td>
-                <td class="hidden-table-entry">
-                    <?php
-                    $label = "Based on this single observation of hand-off, please provide an overall judgement of this learner.";
-                    $field_id = Docc_Public::GetFieldId($form, $label);
-                    if (!empty($entry[$field_id])) echo $entry[$field_id];
-                    else echo "Not observed";
                     ?>
                 </td>
             </tr>

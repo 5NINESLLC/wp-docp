@@ -112,9 +112,9 @@ class Docc
 
     private function schedule_cron_jobs()
     {
-        if (!wp_next_scheduled('docc_delete_old_data')) {
-            wp_schedule_event(time(), 'daily', 'docc_delete_old_data');
-        }
+        if (!wp_next_scheduled('docc_delete_old_data')) wp_schedule_event(time(), 'daily', 'docc_delete_old_data');
+
+        if (!wp_next_scheduled('docc_phi_scrubber')) wp_schedule_event(time(), 'daily', 'docc_phi_scrubber');
     }
 
     /**
@@ -390,6 +390,9 @@ class Docc
         $this->loader->add_action('editable_roles', $data_access, 'disable_new_admins', 10, 1);
 
         $this->loader->add_action('docc_delete_old_data', $data_access, 'docc_delete_old_data');
+        $this->loader->add_action('docc_phi_scrubber', $data_access, 'docc_phi_scrubber');
+
+        $this->loader->add_action('gform_after_submission', $data_access, 'gform_after_submission', 10, 2);
 
         $this->loader->add_action('wp_ajax_scrub_phi_data', $data_access, 'wp_ajax_scrub_phi_data');
         $this->loader->add_action('wp_ajax_toggle_delete_old_data', $data_access, 'wp_ajax_toggle_delete_old_data');
