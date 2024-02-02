@@ -207,7 +207,7 @@ class Docc_Admin extends Docc_Controller
             'DOCC',
             'manage_options',
             $this->menu_slug,
-            [$this, 'menu_page_settings'],
+            [$this, 'menu_page_guided_setup'],
             'dashicons-welcome-widgets-menus',
             1
         );
@@ -215,30 +215,21 @@ class Docc_Admin extends Docc_Controller
         remove_submenu_page($this->menu_slug, $this->menu_slug);
 
         add_submenu_page(
-            $this->menu_slug, 
-            'Settings', 
-            'Settings', 
-            'manage_options', 
-            $this->menu_slug, 
-            [$this, 'menu_page_settings'],
-            2
-        );
-        add_submenu_page(
-            $this->menu_slug, 
-            'MFA', 
-            'MFA', 
-            'manage_options', 
-            'MFA', 
-            [$this, 'menu_page_MFA'],
-            2
-        );
-        add_submenu_page(
             $this->menu_slug,
             'DOCC Setup',
             'DOCC Setup',
             'manage_options',
-            'setup',
+            $this->menu_slug,
             [$this, 'menu_page_guided_setup'],
+            2
+        );
+        add_submenu_page(
+            $this->menu_slug, 
+            'HIPAA', 
+            'HIPAA', 
+            'manage_options', 
+            'hipaa', 
+            [$this, 'menu_page_hipaa'],
             2
         );
         if (!$isSetupInProgress && !$isSetupComplete)
@@ -296,14 +287,9 @@ class Docc_Admin extends Docc_Controller
         echo $this->Partial("admin/partials/setup/docc_setup.html");
     }
 
-    public function menu_page_settings()
+    public function menu_page_hipaa()
     {
-        echo $this->Partial("admin/partials/setup/settings.php");
-    }
-
-    public function menu_page_MFA()
-    {
-        echo $this->Partial("admin/partials/setup/MFA.php");
+        echo $this->Partial("admin/partials/setup/hipaa.php");
     }
 
     public function menu_page_guided_setup()
