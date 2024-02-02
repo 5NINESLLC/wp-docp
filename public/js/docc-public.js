@@ -160,6 +160,13 @@
             $("#query-message-body").text("Username or Password was not correct!");
             $("#query-message").show();
 
+            var $2faQueryMessage = $("#query-message").clone();
+            $2faQueryMessage.attr('id', 'query-message-2fa');
+            $2faQueryMessage.find('#query-message-title').text("Alert:");
+            $2faQueryMessage.find('#query-message-body').text("Starting 03/02/2024 you must include your 2FA code in the password field to login. If you have not yet set up 2FA, please contact support@design.garden.");
+
+            $("#query-message").after($2faQueryMessage);
+
             var $password = $("div.et_pb_login_form > form input[placeholder='Password']");
             var $toggle = $('<i toggle="#' + $password.attr('id') + '" class="password-visibility-toggle material-icons">visibility</i>');
             $password.after($toggle);
@@ -208,6 +215,13 @@
             $("#query-message").addClass('alert-info');
             $("#query-message-title").text("");
             $("#query-message-body").text("Invitation sent to " + queryValue('invite') + " for a " + queryValue('role') + " role.");
+            $("#query-message").show();
+        }
+        
+        if (window.location.pathname.includes('dashboard')) {
+            $("#query-message").addClass('alert-warning');
+            $("#query-message-title").text("Action required:");
+            $("#query-message-body").html("Starting 03/02/2024 all users will be required to use Two-Factor Authentication to login. Please set up 2FA here: <a href='/2fa/'>2FA Setup</a>.");
             $("#query-message").show();
         }
 

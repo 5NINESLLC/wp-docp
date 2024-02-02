@@ -929,4 +929,28 @@ table.dataTable.dtr-inline.collapsed>tbody>tr[role="row"]>th:first-child::before
   }
 }
 
+.tooltip1 {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+  color: white;
+  cursor: help;
+}
+
+.tooltip1 .tooltiptext1 {
+  visibility: hidden;
+  width: 280px;
+  background-color: white;
+  color: black;
+  text-align: left;
+  border-radius: 6px;
+  padding: 15px;
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip1:hover .tooltiptext1 {
+  visibility: visible;
+}
+
 /* END:     Copied from output css */
