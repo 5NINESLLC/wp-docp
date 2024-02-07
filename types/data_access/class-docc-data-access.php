@@ -53,21 +53,21 @@ class Data_Access extends Docc_Controller
     {
         $phi_entries = $this->get_user_phi_entries();
 
-        $this->scrub_user_phi_data($phi_entries);
+        $this->scrub_user_phi_data($phi_entries, "User Scrubbing");
 
         wp_die();
     }
 
-    private function scrub_user_phi_data($entries)
+    private function scrub_user_phi_data($entries, $action)
     {
         foreach ($entries as $entry) {
             $phi_entry = $this->check_for_phi($entry);
 
-            if ($phi_entry['contains_phi']) $this->scrub_phi_entry($entry, $phi_entry);
+            if ($phi_entry['contains_phi']) $this->scrub_phi_entry($entry, $phi_entry, $action);
         }
     }
 
-    private function scrub_phi_entry($entry, $phi_entry)
+    private function scrub_phi_entry($entry, $phi_entry, $action)
     {
         foreach ($phi_entry as $field => $phi) {
             if ($field === 'contains_phi') continue;
@@ -80,6 +80,31 @@ class Data_Access extends Docc_Controller
         GFAPI::update_entry($entry);
 
         $this->send_phi_email($entry, $phi_entry);
+
+        $this->log_phi_access($entry['id'], $phi_entry, $action);
+    }
+
+    private function log_phi_access($entry_id, $phi_entry, $action)
+    {
+        $phi_fields = [];
+
+        foreach ($phi_entry as $field => $phi) {
+            if ($field === 'contains_phi') continue;
+            foreach ($phi[1] as $entity) {
+                $phi_fields[] = $entity->Type;
+            }
+        }
+        
+        $logDirPath = '../hipaa_logs';
+        $logFilePath = $logDirPath . '/log.txt';
+
+        if (!is_dir($logDirPath)) {
+            mkdir($logDirPath, 0755, true);
+        }
+
+        $logEntry = $action . ": Entry " . $entry_id . " [" . implode(", ", $phi_fields) . "]" . " on " . date('Y-m-d H:i:s') . PHP_EOL;
+
+        file_put_contents($logFilePath, $logEntry, FILE_APPEND);
     }
 
     private function send_phi_email($entry, $phi_entry)
@@ -172,7 +197,7 @@ class Data_Access extends Docc_Controller
     {
         $entries = $this->get_daily_phi_entries();
 
-        $this->scrub_user_phi_data($entries);
+        $this->scrub_user_phi_data($entries, "Daily Scrubbing");
 
         wp_die();
     }
@@ -235,8 +260,13 @@ class Data_Access extends Docc_Controller
         foreach ($entries as $entry) {
             $phi_entry = $this->check_for_phi($entry);
 
-            if ($phi_entry['contains_phi']) $phi_fields[] = $entry;
+            if ($phi_entry['contains_phi'])
+            {
+                $phi_fields[] = $entry;
+                $this->log_phi_access($entry['id'], $phi_entry, "User Access");
+            }
         }
+
 
         return $phi_fields;
     }
@@ -298,6 +328,6 @@ class Data_Access extends Docc_Controller
 
         $phi_entry = $this->check_for_phi($entry);
 
-        if ($phi_entry['contains_phi']) $this->scrub_phi_entry($entry, $phi_entry);
+        if ($phi_entry['contains_phi']) $this->scrub_phi_entry($entry, $phi_entry, "GF Submission");
     }
 }
