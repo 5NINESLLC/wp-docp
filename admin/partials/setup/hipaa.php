@@ -70,3 +70,11 @@ Why don't we allow it in the app?
         We encourage all our users to review their entries and utilize these features to maintain their privacy and comply 
         with our app's policies.
     </p>
+
+    <p>
+       For more information on HIPAA regulations check out the following links:
+        <br>
+       <a href="https://www.dhcs.ca.gov/dataandstats/data/Pages/ListofHIPAAIdentifiers.aspx" target="_blank" rel="noopener">HIPAA Identifiers</a>
+       <br>
+       <a href="https://aws.amazon.com/compliance/hipaa-compliance/" target="_blank" rel="noopener">AWS Regulations</a>
+    </p>
