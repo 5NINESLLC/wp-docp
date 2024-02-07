@@ -2,6 +2,44 @@
     'use strict';
 
     $(document).ready(function () {
+        $('#modal-iframe').on('load', function () {
+            var iframe = $('#modal-iframe')[0];
+            var iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+
+            var header = iframeDocument.getElementsByTagName('header')[0];
+            var footer = iframeDocument.getElementsByTagName('footer')[0];
+
+            if (header) {
+                header.style.display = 'none';
+            }
+            if (footer) {
+                footer.style.display = 'none';
+            }
+
+            var body = iframeDocument.getElementsByClassName('et_pb_section_0_tb_body')[0];
+            if (body) {
+                body.style.padding = '0';
+            }
+
+            $('#loader').css('display', 'none');
+            iframe.style.display = 'block';
+        });
+        $('.modal-link').click(function(event) {
+            event.preventDefault();
+            var href = $(this).attr('href');
+
+            $('#loader').css('display', 'block');
+            $('#modal-iframe').css('display', 'none');
+    
+            $('#modal-iframe').attr('src', href);
+            $('#myModal').css('display', 'block');
+            $('body').css('overflow', 'hidden');
+        });
+        $('.close').click(function() {
+            $('#myModal').css('display', 'none');
+            $('#modal-iframe').attr('src', '');
+            $('body').css('overflow', 'auto');
+        });
         query_message(demo_mode);
         // Testing
         let testMode = 0;
@@ -86,7 +124,6 @@
         }
 
     });
-
     function queryValue(name) {
         var results = new RegExp('[\?&]' + name + '=([^&#]*)')
             .exec(window.location.search);
