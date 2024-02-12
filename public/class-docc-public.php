@@ -324,16 +324,27 @@ class Docc_Public extends Docc_Controller
         }
     }
 
-    function authenticate($user, $username, $password)
+    /**
+     * Filters whether a set of user login credentials are valid.
+     *
+     * @param null|WP_User|WP_Error $user_or_error WP_User if the user is authenticated. WP_Error or null otherwise.
+     * @param string $username_or_email Username or email address.
+     * @param string $password
+     * @return void
+     */
+    function authenticate($user_or_error, $username_or_email, $password)
     {
-        if (empty($username) || empty($password)) {
-            $error = new WP_Error();
-            $user  = new WP_Error('authentication_failed', __('<strong>ERROR</strong>: Invalid username or incorrect password.'));
+        if (empty($user_or_error) || empty($password)) {
+            // 20240212, mk: I'm not sure how this is used or if this is necessary...
+            $user_or_error  = new WP_Error('authentication_failed', __('<strong>ERROR</strong>: Invalid username or incorrect password.'));
 
-            return $error;
+            return $user_or_error;
         }
 
-        return $user;
+        // TODO: Add a custom error message for users that are pending activation (via the User Registration Add-On).
+        //       https://docs.gravityforms.com/display-message-login-form-user-pending-activation/
+
+        return $user_or_error;
     }
 
     public function gform_incomplete_submissions_expiration_days($expiration_days)
